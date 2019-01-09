@@ -3,10 +3,9 @@ with Pal; use Pal;
 with Proxy;
 
 procedure Monitor is
-   ptr : Proxy.ManagerPtr;
-
+   ptr : Proxy.ManagerPtr := Proxy.GetManager;
 begin
-   ptr := Proxy.GetManager;
+   ptr.Start;
 
    loop
       declare

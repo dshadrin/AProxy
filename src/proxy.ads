@@ -14,6 +14,7 @@ package Proxy is
    function GetManager return ManagerPtr;
    function GetConfig return ConfiguratorPtr;
    procedure DeleteManager;
+   procedure Start (Object : in out Manager);
    
 private
    mgrPtr : ManagerPtr;
@@ -23,7 +24,7 @@ private
    ---------------------------------
    type Configurator is new Ada.Finalization.Limited_Controlled with
       record
-         dom : ConfigTree.Tree;
+         data : ConfigTree.Tree;
       end record;
       
    procedure Initialize (Object : in out Configurator);
@@ -39,5 +40,5 @@ private
       
    procedure Initialize (Object : in out Manager);
    procedure Finalize (Object : in out Manager);
-
+   
 end Proxy;

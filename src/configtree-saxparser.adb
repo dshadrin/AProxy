@@ -44,16 +44,14 @@ package body ConfigTree.SaxParser is
       temp : NodePtr := new Node;
    begin
       if Handler.current = null then
-         if Handler.parent /= null then
-            -- add next parent child
-            if Handler.parent.childFirst = null then
-               Handler.parent.childFirst := temp;
-            else
-               Handler.parent.childLast.next := temp;
-            end if;
-            Handler.parent.childLast := temp;
-            temp.parent := Handler.parent;
+         -- add next parent child
+         if Handler.parent.childFirst = null then
+            Handler.parent.childFirst := temp;
+         else
+            Handler.parent.childLast.next := temp;
          end if;
+         Handler.parent.childLast := temp;
+         temp.parent := Handler.parent;
       else
          if Handler.current.childFirst = null then
             Handler.current.childFirst := temp;
@@ -66,7 +64,7 @@ package body ConfigTree.SaxParser is
       end if;
       Handler.current := temp;
       Handler.current.name := To_Unbounded_String (Qname);
-      Put_Line("Start_Element: " & To_String(To_Unbounded_String(Qname)));
+      -- Put_Line("Start_Element: " & To_String(To_Unbounded_String(Qname)));
    end Start_Element;
 
    ---------------------------------------------------------------------------------------------------------------------
@@ -78,14 +76,12 @@ package body ConfigTree.SaxParser is
       x : Integer := 0;
    begin
       if Handler.current.name = To_Unbounded_String (Qname) then
-         if Handler.parent /= null then
-            Handler.current := Handler.parent;
-            Handler.parent := Handler.current.parent;
-         end if;
+         Handler.current := Handler.parent;
+         Handler.parent := Handler.current.parent;
       else
          raise Program_Error;
       end if;
-      Put_Line("End_Element: " & To_String(To_Unbounded_String(Qname)));
+      -- Put_Line("End_Element: " & To_String(To_Unbounded_String(Qname)));
    end End_Element;
 
    ---------------------------------------------------------------------------------------------------------------------
@@ -94,11 +90,11 @@ package body ConfigTree.SaxParser is
       Ch      : Unicode.CES.Byte_Sequence) is
    begin
       Handler.current.data := Handler.current.data & To_Unbounded_String(Ch);
-      Put_Line("Characters: " & To_String(Handler.current.data));
+      -- Put_Line("Characters: " & To_String(Handler.current.data));
    end Characters;
 
    ---------------------------------------------------------------------------------------------------------------------
-   procedure Parse (node : in out ConfigTree.NodePtr) is
+   procedure Parse (root : in out ConfigTree.NodePtr) is
       saxReader : Reader;
       input     : File_Input;
    begin
@@ -111,9 +107,9 @@ package body ConfigTree.SaxParser is
       Set_Feature (saxReader, Namespace_Feature, False);
       Set_Feature (saxReader, Validation_Feature, False);
 
+      saxReader.parent := root;
       Parse (saxReader, input);
       Close (input);
-      node := saxReader.current;
    end Parse;
 
 end ConfigTree.SaxParser;

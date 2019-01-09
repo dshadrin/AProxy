@@ -1,5 +1,6 @@
 with Unchecked_Deallocation;
 with Ada.Text_IO; use Ada.Text_IO;
+with ConfigTree; use ConfigTree;
 
 package body Proxy is
 
@@ -33,6 +34,15 @@ package body Proxy is
       Free(Object.config); 
       Put_Line("Stop Manager");
    end Finalize;
+   
+   procedure Start (Object : in out Manager) is
+      actors : NodePtr := GetConfig.data.GetChild ("proxy.actors");
+   begin
+      if actors /= 0 then
+         actors := null;
+      end if;
+      
+   end Start;
 
    ---------------------------------
    -- Package free functions      --
