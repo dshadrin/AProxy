@@ -20,11 +20,11 @@ package body ConfigTree is
    end Finalize;
    
    function GetChild (Object : in out Node; path : String) return NodePtr is
-      str : Unbounded_String := To_Unbounded_String (path);
-      pos : Natural := Index (str, ".", 1);
+      str   : Unbounded_String := To_Unbounded_String (path);
+      pos   : Natural := Index (str, ".", 1);
       first : Unbounded_String;
       last  : Unbounded_String;
-      node : NodePtr := Object.childFirst;
+      node  : NodePtr := Object.childFirst;
    begin
       if pos = 0 then
          first := str;
@@ -46,12 +46,22 @@ package body ConfigTree is
       end if;
       
       if Length (last) > 0 then
-         node := GetChild(node, last);
+         node := node.GetChild(To_String(last));
       end if;
       
       return node;
    end GetChild;
    
+   function GetFirst(Object : in out Node) return NodePtr is
+   begin
+      return Object.childFirst;
+   end GetFirst;
+   
+   function GetNext(Object : in out Node) return NodePtr is
+   begin
+      return Object.next;
+   end GetNext;
+
    ---------------------------------------------------------------------------------------------------------------------
    procedure Finalize (Object : in out Tree) is
    begin
@@ -72,5 +82,10 @@ package body ConfigTree is
       return Object.root.GetChild (path);
    end GetChild;
    
+   function IsNull(ptr : in NodePtr) return Boolean is
+   begin
+      return ptr = null;
+   end IsNull;
+
 
 end ConfigTree;

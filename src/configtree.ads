@@ -17,6 +17,10 @@ package ConfigTree is
       end record;
 
    function GetChild(Object : in out Node; path : String) return NodePtr;
+   function GetFirst(Object : in out Node) return NodePtr;
+   function GetNext(Object : in out Node) return NodePtr;
+   
+   function IsNull(ptr : in NodePtr) return Boolean;
    
    type Tree is tagged limited private;
    

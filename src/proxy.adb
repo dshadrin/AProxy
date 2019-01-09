@@ -38,7 +38,7 @@ package body Proxy is
    procedure Start (Object : in out Manager) is
       actors : NodePtr := GetConfig.data.GetChild ("proxy.actors");
    begin
-      if actors /= 0 then
+      if not IsNull(actors) then
          actors := null;
       end if;
       
