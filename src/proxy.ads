@@ -3,6 +3,7 @@ with Ada.Finalization;
 with ConfigTree;
 
 package Proxy is
+   pragma Elaborate_Body;
 
    type Configurator is tagged limited private;
    type ConfiguratorPtr is access Configurator;

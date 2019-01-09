@@ -7,26 +7,24 @@ package body ConfigTree is
    procedure Free is new Unchecked_Deallocation(Node, NodePtr);
    
    ---------------------------------------------------------------------------------------------------------------------
-   procedure DeleteNode(ptr : in out NodePtr) is
-      workNode : NodePtr;
-      tempNode : NodePtr;
+   procedure Finalize (Object : in out Node) is
    begin
-      if ptr /= null then
-         workNode := ptr.childFirst;
-         -- remove cilds in loop
-         while workNode /= null loop
-            tempNode := workNode.next; -- save reference to next child
-            DeleteNode(workNode);      -- delete node with it childs
-            workNode := tempNode;      -- restore saved reference
-         end loop;
-         Free(ptr);
+      
+      if Object.next /= null then
+         Free (Object.next);
       end if;
-   end DeleteNode;
+      if Object.childFirst /= null then
+         Free (Object.childFirst);
+      end if;
+      Put_Line("Finalize Node: " & To_String(Object.name));
+   end Finalize;
 
    ---------------------------------------------------------------------------------------------------------------------
    procedure Finalize (Object : in out Tree) is
    begin
-      DeleteNode(Object.head);
+      if Object.head /= null then
+         Free (Object.head);
+      end if;
       Put_Line("Finalize ConfigTree");
    end Finalize;
    

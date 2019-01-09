@@ -8,7 +8,7 @@ project Proxy is
    for Main use ("monitor.adb");
 
    package Compiler is
-      for Switches ("ada") use ("-O3", "-gnat12", "-g");
+      for Switches ("ada") use ("-gnat12", "-g");
    end Compiler;
 
    package Linker is
