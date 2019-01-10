@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <proxy>
+  <system>
+    <time_correct>-7200</time_correct>
+  </system>
   <logger>
       <severity>TRACE</severity>
       <severity_console>DEBUG</severity_console>

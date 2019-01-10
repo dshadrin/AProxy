@@ -35,8 +35,8 @@ package body ConfigTree is
          last := str;
          Delete (last, 1, pos);
       end if;
-      Put_Line("First: " & To_String(first));
-      Put_Line ("Last: " & To_String (last));
+--      Put_Line("First: " & To_String(first));
+--      Put_Line ("Last: " & To_String (last));
       
       if Length (first) > 0 then
          while node /= null loop
@@ -61,7 +61,18 @@ package body ConfigTree is
    begin
       return Object.next;
    end GetNext;
+   
+   function GetValue (Object : in out Node; path : in String; default : in String := "") return String is
+      node : NodePtr;
+   begin
+      node := Object.GetChild (path);
+      if not IsNull (node) then
+         return To_String(node.data);
+      end if;
+      return default;
+   end GetValue;
 
+   
    ---------------------------------------------------------------------------------------------------------------------
    procedure Finalize (Object : in out Tree) is
    begin
@@ -77,11 +88,17 @@ package body ConfigTree is
       SaxParser.Parse(Object.root);
    end Initialize;
    
-   function GetChild (Object : in out Tree; path : String) return NodePtr is
+   function GetChild (Object : in out Tree; path : in String) return NodePtr is
    begin
       return Object.root.GetChild (path);
    end GetChild;
    
+   function GetValue (Object : in out Tree; path : in String; default : in String := "") return String is
+   begin
+      return Object.root.GetValue (path, default);
+   end GetValue;
+   
+   ---------------------------------------------------------------------------------------------------------------------
    function IsNull(ptr : in NodePtr) return Boolean is
    begin
       return ptr = null;

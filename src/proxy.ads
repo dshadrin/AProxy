@@ -5,8 +5,11 @@ with ConfigTree;
 package Proxy is
    pragma Elaborate_Body;
 
-   type Configurator is tagged limited private;
+   type Configurator is limited private;
    type ConfiguratorPtr is access Configurator;
+   
+   function GetChild(ptr : in ConfiguratorPtr; path : in String) return ConfigTree.NodePtr;
+   function GetValue(ptr : in ConfiguratorPtr; path : in String; default : in String := "") return String;
 
    type Manager is tagged limited private;
    type ManagerPtr is access all Manager;
