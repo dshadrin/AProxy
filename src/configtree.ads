@@ -3,8 +3,21 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package ConfigTree is
 
-   type Node;
+   type Node is limited private;
    type NodePtr is access all Node;
+   
+   function IsNull(ptr : in NodePtr) return Boolean;
+   function GetFirst(Object : in out Node) return NodePtr;
+   function GetNext(Object : in out Node) return NodePtr;
+   function GetChild(Object : in out Node; path : in String) return NodePtr;
+   function GetValue (Object : in out Node; path : in String; default : in String := "") return String;
+  
+   type Tree is tagged limited private;
+   
+   function GetChild (Object : in out Tree; path : in String) return NodePtr;
+   function GetValue (Object : in out Tree; path : in String; default : in String := "") return String;
+
+private
    
    type Node is limited new Ada.Finalization.Limited_Controlled with
       record
@@ -16,18 +29,6 @@ package ConfigTree is
          data        : Unbounded_String;   -- data
       end record;
 
-   function GetChild(Object : in out Node; path : String) return NodePtr;
-   function GetFirst(Object : in out Node) return NodePtr;
-   function GetNext(Object : in out Node) return NodePtr;
-   
-   function IsNull(ptr : in NodePtr) return Boolean;
-   
-   type Tree is tagged limited private;
-   
-   function GetChild(Object : in out Tree; path : String) return NodePtr;
-
-private
-   
    procedure Finalize (Object : in out Node);
    
    type Tree is new Ada.Finalization.Limited_Controlled with

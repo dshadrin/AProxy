@@ -2,12 +2,13 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Pal; use Pal;
 with Proxy;
 with TimeStamp; use TimeStamp;
+with Interfaces.C;
 
 procedure Monitor is
    ptr : Proxy.ManagerPtr := Proxy.GetManager;
-   ts  : timespec := GetTimestamp;
 begin
    ptr.Start;
+   Put_Line(GetTimestampStr);
 
    loop
       declare

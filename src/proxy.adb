@@ -20,6 +20,16 @@ package body Proxy is
       Put_Line("Stop Configurator");
    end Finalize;
    
+   function GetChild (ptr : in ConfiguratorPtr; path : in String) return NodePtr is
+   begin
+      return ptr.data.GetChild(path);
+   end GetChild;
+   
+   function GetValue (ptr : in ConfiguratorPtr; path : in String; default : in String := "") return String is
+   begin
+      return ptr.data.GetValue(path, default);
+   end GetValue;
+         
    ---------------------------------
    -- Manager implementation      --
    ---------------------------------
