@@ -2,8 +2,14 @@
 with Ada.Calendar.Conversions;
 with Ada.Real_Time;
 with Proxy;
+with Formatted_Output; use Formatted_Output;
+with Formatted_Output.Integer_Output;
 
 package body TimeStamp is
+
+   package Formatter_Integer is new Formatted_Output.Integer_Output(Integer);
+   package Formatter_LongInteger is new Formatted_Output.Integer_Output(Long_Integer);
+   package Formatter_Cint is new Formatted_Output.Integer_Output(Interfaces.C.int);
 
    ONE_SECOND_IN_MICROSECONDS : constant Long_Long_Integer := 1000000;
 
@@ -11,7 +17,7 @@ package body TimeStamp is
       tmPoint : Ada.Real_Time.Time := Ada.Real_Time.Clock;
       nsec    : Ada.Real_Time.Time_Span;
       sec     : Ada.Real_Time.Seconds_Count;
-      tv : timespec := (0, 0);
+      tv      : timespec := (0, 0);
    begin
       Ada.Real_Time.Split (tmPoint, sec, nsec);
       Ada.Calendar.Conversions.To_Struct_Timespec (Ada.Real_Time.To_Duration(nsec), tv.tv_sec, tv.tv_nsec);
@@ -22,31 +28,31 @@ package body TimeStamp is
    end GetTimestamp;
 
    procedure TimestampAdjust (tv : in out timespec; deltaMicrosec : Integer) is
-      mcs : Long_Long_Integer;
-      sec : Long_Long_Integer;
+      mcs  : Long_Long_Integer;
+      sec  : Long_Long_Integer;
       part : Long_Long_Integer;
    begin
-    if deltaMicrosec /= 0 then
-        mcs := ((Long_Long_Integer(tv.tv_sec) rem ONE_SECOND_IN_MICROSECONDS) * ONE_SECOND_IN_MICROSECONDS) + Long_Long_Integer(tv.tv_nsec) + Long_Long_Integer(deltaMicrosec);
-        sec := ((Long_Long_Integer(tv.tv_sec) / ONE_SECOND_IN_MICROSECONDS) * ONE_SECOND_IN_MICROSECONDS);
+      if deltaMicrosec /= 0 then
+         mcs := ((Long_Long_Integer(tv.tv_sec) rem ONE_SECOND_IN_MICROSECONDS) * ONE_SECOND_IN_MICROSECONDS) + Long_Long_Integer(tv.tv_nsec) + Long_Long_Integer(deltaMicrosec);
+         sec := ((Long_Long_Integer(tv.tv_sec) / ONE_SECOND_IN_MICROSECONDS) * ONE_SECOND_IN_MICROSECONDS);
 
-        tv.tv_sec := Interfaces.C.long(sec + mcs / ONE_SECOND_IN_MICROSECONDS);
+         tv.tv_sec := Interfaces.C.long(sec + mcs / ONE_SECOND_IN_MICROSECONDS);
 
-        part := mcs rem ONE_SECOND_IN_MICROSECONDS;
-        if part < 0 then
+         part := mcs rem ONE_SECOND_IN_MICROSECONDS;
+         if part < 0 then
             part := part + ONE_SECOND_IN_MICROSECONDS;
             tv.tv_sec := Interfaces.C.long(Long_Long_Integer(tv.tv_sec) - 1);
-        end if;
+         end if;
 
-        tv.tv_nsec := Interfaces.C.long(part);
-    end if;
+         tv.tv_nsec := Interfaces.C.long(part);
+      end if;
    end TimestampAdjust;
 
    procedure ConvertTimestamp (tv : in timespec; tmStruct : out tm; us : out Long_Integer; deltaMicrosec : Integer := 0) is
       tv_temp : timespec := tv;
-      dur : Duration;
-      nsec : Ada.Real_Time.Time_Span;
-      sec  : Ada.Real_Time.Seconds_Count;
+      dur     : Duration;
+      nsec    : Ada.Real_Time.Time_Span;
+      sec     : Ada.Real_Time.Seconds_Count;
       tmPoint : Ada.Real_Time.Time;
    begin
       TimestampAdjust (tv_temp, deltaMicrosec);
@@ -61,32 +67,15 @@ package body TimeStamp is
    end ConvertTimestamp;
 
    function GetTimestampStr (tmStruct : in tm; us : in Long_Integer) return String is
-      str : Unbounded_String;
+      use Formatter_LongInteger;
+      use Formatter_Cint;
    begin
-      if Integer(tmStruct.tm_hour) < 10 then
-         Append (str, "0");
-      end if;
-      Append (str, tmStruct.tm_hour'Img);
-      Append (str, ":");
-      if Integer(tmStruct.tm_min) < 10 then
-         Append (str, "0");
-      end if;
-      Append (str, tmStruct.tm_min'Img);
-      Append (str, ":");
-      if Integer(tmStruct.tm_sec) < 10 then
-         Append (str, "0");
-      end if;
-      Append (str, tmStruct.tm_sec'Img);
-      Append (str, ".");
-
-      Append (str, us'Img);
-
-      return To_String(str);
+      return To_String(+"%02d:%02d:%02d.%06d" & tmStruct.tm_hour & tmStruct.tm_min & tmStruct.tm_sec & us);
    end GetTimestampStr;
 
    function GetTimestampStr (tv : in timespec) return String is
       tmStruct : tm;
-      us : Long_Integer;
+      us       : Long_Integer;
    begin
       ConvertTimestamp (tv, tmStruct, us);
       return GetTimestampStr(tmStruct, us);

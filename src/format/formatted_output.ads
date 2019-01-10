@@ -59,7 +59,7 @@ private
 
    type Format_Type is new Ada.Strings.Unbounded.Unbounded_String;
    
-   Maximal_Item_Length : constant := 128;
+   Maximal_Item_Length : constant := 4096;
 
    function Scan_To_Percent_Sign (Fmt : Format_Type) return Integer;
    --  Scans string to the first occurence of percent sign ignoring the double

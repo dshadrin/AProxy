@@ -18,8 +18,7 @@ begin
       end;
    end loop;
 
+   Put_Line(GetTimestampStr);
    Proxy.DeleteManager;
    ptr := null;
-
-
 end Monitor;
