@@ -1,4 +1,5 @@
 with "xmlada_sax.gpr";
+limited with "format.gpr";
 
 project Proxy is
 

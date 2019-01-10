@@ -1,0 +1,113 @@
+------------------------------------------------------------------------------
+--                                                                          --
+--  Formatted_Output package for Ada-95 brief documentation                 --
+--                                                                          --
+--  Author:                                                                 --
+--     Eugene Nonko, cm@liceum.secna.ru                                     --
+--                                                                          --
+------------------------------------------------------------------------------
+
+Escape sequences in format strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`\n' - line feed
+`\r' - carriage return
+`\b' - backspace
+
+Format sequences for strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%[<justification>][<width>]s
+
+<justification> is
+   `+' - align to right (default)
+   `-' - align to left
+   `*' - centered
+
+<width> is decimal number specifying field width
+
+Examples:
+   +"%s" & "Hello"                      "Hello"
+   +"%9s" & "Hello"                     "    Hello"
+   +"%-7s" & "Hello"                    "Hello  "
+   +"%*11s" & "Hello"                   "   Hello   "
+
+Format sequences for enumeration types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%[<justification>][<width>](c|u|l)
+
+<justification> is
+   `+' - align to right (default)
+   `-' - align to left
+   `*' - centered
+
+<width> is decimal number specifying field width
+
+Format specifier can be
+   `c' - convert capitalized
+   `u' - convert in lower case
+   `l' - convert in upper case
+
+Examples:
+   +"%u" & Red                          "RED"
+   +"%9u" & Red                         "      RED"
+   +"%-7c" & Red                        "Red    "
+   +"%*11l" & Red                       "    red    "
+
+Format sequences for integer and modular types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%[<justification>][0][<width>](d|x|o|b)
+
+<justification> is
+   `+' - align to right (default)
+   `-' - align to left
+   `*' - centered
+
+Specify `0' before width to pad field with leading zeroes
+
+<width> is decimal number specifying field width
+
+Format specifier can be
+   `d' - convert as decimal
+   `x' - convert as hexadecimal
+   `o' - convert as octal
+   `b' - convert as binary
+
+Examples:
+   +"%d" & 123                          "123"
+   +"%d" & -123                         "-123"
+   +"%x" & 123                          "7B"
+   +"%b" & 123                          "1111011"
+   +"%8x" & 123                         "      7B"
+   +"%08x" & 123                        "0000007B"
+   +"%*07d" & 123                       "00123  "
+   +"%*08d" & -123                      "-00123  "
+
+Format sequences for floating point types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%[<justification>][0][<width>[.<width_aft>]](e|f|g)
+
+<justification> is
+   `+' - align to right (default)
+   `-' - align to left
+   `*' - centered
+
+Specify `0' before width to pad field with leading zeroes
+
+<width> is decimal number specifying field width
+
+<width_aft> is decimal number specifying number of digits after decimal point
+
+Format specifier can be
+   `e' - convert to exponential representation
+   `f' - convert without exponent field
+   `g' - convert to shortest representation without any trailing zeroes
+
+Examples:
+   +"%e" & 1234.5                       "1.23450E+03"
+   +"%f" & 1234.5                       "1234.50000"
+   +"%g" & 1234.5                       "1234.5"
+   +"%10.3e" & 1234.5                   " 1.235E+03"
+   +"%10.3f" & 1234.5                   "  1234.500"
+   +"%10.3g" & 1234.5                   "    1234.5"
+   +"%010.3e" & 1234.5                  "01.235E+03"
+   +"%010.3f" & 1234.5                  "001234.500"
+   +"%010.3g" & 1234.5                  "00001234.5"
