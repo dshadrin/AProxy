@@ -7,9 +7,28 @@ with Formatted_Output.Integer_Output;
 
 package body TimeStamp is
 
-   package Formatter_Integer is new Formatted_Output.Integer_Output(Integer);
    package Formatter_LongInteger is new Formatted_Output.Integer_Output(Long_Integer);
-   package Formatter_Cint is new Formatted_Output.Integer_Output(Interfaces.C.int);
+   package Formatter_Cint is new Formatted_Output.Integer_Output (Interfaces.C.int);
+
+   function "<" (lhd : in Interfaces.C.long; rhd : in Interfaces.C.long) return bool is
+   begin
+      return Long_Integer(lhd) < Long_Integer(rhd);
+   end;
+
+   function "=" (lhd : in Interfaces.C.long; rhd : in Interfaces.C.long) return bool is
+   begin
+      return Long_Integer(lhd) = Long_Integer(rhd);
+   end;
+
+   function "<" (lhd : in timespec; rhd : in timespec) return bool is
+      status : bool := lhd.tv_sec < rhd.tv_sec;
+   begin
+      if not status and then lhd.tv_sec = rhd.tv_sec
+      then
+         status := lhd.tv_nsec < rhd.tv_nsec;
+      end if;
+    return status;
+   end;
 
    ONE_SECOND_IN_MICROSECONDS : constant Long_Long_Integer := 1000000;
 

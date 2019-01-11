@@ -3,12 +3,13 @@ with Pal; use Pal;
 with Proxy;
 with TimeStamp; use TimeStamp;
 with Interfaces.C;
+with Logging_Message; use Logging_Message;
 
 procedure Monitor is
    ptr : Proxy.ManagerPtr := Proxy.GetManager;
 begin
    ptr.Start;
-   Put_Line(GetTimestampStr);
+   LOG_INFO("LOG ", "Start Manager");
 
    loop
       declare
@@ -18,7 +19,7 @@ begin
       end;
    end loop;
 
-   Put_Line(GetTimestampStr);
+   LOG_INFO("LOG ", "Stop Manager");
    Proxy.DeleteManager;
    ptr := null;
 end Monitor;

@@ -1,11 +1,11 @@
-with Unchecked_Deallocation;
+with Ada.Unchecked_Deallocation;
 with Ada.Text_IO; use Ada.Text_IO;
 with ConfigTree; use ConfigTree;
 
 package body Proxy is
 
-   procedure Free is new Unchecked_Deallocation(Configurator, ConfiguratorPtr);
-   procedure Free is new Unchecked_Deallocation(Manager, ManagerPtr);
+   procedure Free is new Ada.Unchecked_Deallocation(Configurator, ConfiguratorPtr);
+   procedure Free is new Ada.Unchecked_Deallocation(Manager, ManagerPtr);
 
    ---------------------------------
    -- Configurator implementation --

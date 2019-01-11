@@ -1,3 +1,4 @@
+with Pal; use Pal;
 with Interfaces.C;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
@@ -8,6 +9,10 @@ package TimeStamp is
          tv_sec : Interfaces.C.long;
          tv_nsec : Interfaces.C.long;
       end record;
+
+   function "<" (lhd : in Interfaces.C.long; rhd : in Interfaces.C.long) return bool;
+   function "<" (lhd : in timespec; rhd : in timespec) return bool;
+
 
    type tm is
       record
