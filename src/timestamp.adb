@@ -1,3 +1,7 @@
+----------------------------------------
+-- Copyright (C) 2019 Dmitriy Shadrin --
+-- All rights reserved.               --
+----------------------------------------
 
 with Ada.Calendar.Conversions;
 with Ada.Real_Time;
@@ -5,21 +9,26 @@ with Proxy;
 with Formatted_Output; use Formatted_Output;
 with Formatted_Output.Integer_Output;
 
+------------------------------------------------------------------------------------------------------------------------
 package body TimeStamp is
 
    package Formatter_LongInteger is new Formatted_Output.Integer_Output(Long_Integer);
    package Formatter_Cint is new Formatted_Output.Integer_Output (Interfaces.C.int);
+   ONE_SECOND_IN_MICROSECONDS : constant Long_Long_Integer := 1000000;
 
+   ---------------------------------------------------------------------------------------------------------------------
    function "<" (lhd : in Interfaces.C.long; rhd : in Interfaces.C.long) return bool is
    begin
       return Long_Integer(lhd) < Long_Integer(rhd);
    end;
 
+   ---------------------------------------------------------------------------------------------------------------------
    function "=" (lhd : in Interfaces.C.long; rhd : in Interfaces.C.long) return bool is
    begin
       return Long_Integer(lhd) = Long_Integer(rhd);
    end;
 
+   ---------------------------------------------------------------------------------------------------------------------
    function "<" (lhd : in timespec; rhd : in timespec) return bool is
       status : bool := lhd.tv_sec < rhd.tv_sec;
    begin
@@ -27,11 +36,10 @@ package body TimeStamp is
       then
          status := lhd.tv_nsec < rhd.tv_nsec;
       end if;
-    return status;
+      return status;
    end;
 
-   ONE_SECOND_IN_MICROSECONDS : constant Long_Long_Integer := 1000000;
-
+   ---------------------------------------------------------------------------------------------------------------------
    function GetTimestamp return timespec is
       tmPoint : Ada.Real_Time.Time := Ada.Real_Time.Clock;
       nsec    : Ada.Real_Time.Time_Span;
@@ -46,6 +54,7 @@ package body TimeStamp is
       return tv;
    end GetTimestamp;
 
+   ---------------------------------------------------------------------------------------------------------------------
    procedure TimestampAdjust (tv : in out timespec; deltaMicrosec : Integer) is
       mcs  : Long_Long_Integer;
       sec  : Long_Long_Integer;
@@ -67,6 +76,7 @@ package body TimeStamp is
       end if;
    end TimestampAdjust;
 
+   ---------------------------------------------------------------------------------------------------------------------
    procedure ConvertTimestamp (tv : in timespec; tmStruct : out tm; us : out Long_Integer; deltaMicrosec : Integer := 0) is
       tv_temp : timespec := tv;
       dur     : Duration;
@@ -85,6 +95,7 @@ package body TimeStamp is
       us := Long_Integer(tv_temp.tv_nsec);
    end ConvertTimestamp;
 
+   ---------------------------------------------------------------------------------------------------------------------
    function GetTimestampStr (tmStruct : in tm; us : in Long_Integer) return String is
       use Formatter_LongInteger;
       use Formatter_Cint;
@@ -92,6 +103,7 @@ package body TimeStamp is
       return To_String(+"%02d:%02d:%02d.%06d" & tmStruct.tm_hour & tmStruct.tm_min & tmStruct.tm_sec & us);
    end GetTimestampStr;
 
+   ---------------------------------------------------------------------------------------------------------------------
    function GetTimestampStr (tv : in timespec) return String is
       tmStruct : tm;
       us       : Long_Integer;
@@ -100,6 +112,7 @@ package body TimeStamp is
       return GetTimestampStr(tmStruct, us);
    end GetTimestampStr;
 
+   ---------------------------------------------------------------------------------------------------------------------
    function GetTimestampStr return String is
    begin
       return GetTimestampStr(GetTimestamp);

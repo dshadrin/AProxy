@@ -1,7 +1,13 @@
+----------------------------------------
+-- Copyright (C) 2019 Dmitriy Shadrin --
+-- All rights reserved.               --
+----------------------------------------
+
 with Unchecked_Deallocation;
 with Ada.Text_IO; use Ada.Text_IO;
 with ConfigTree.SaxParser;
 
+------------------------------------------------------------------------------------------------------------------------
 package body ConfigTree is
 
    procedure Free is new Unchecked_Deallocation(Node, NodePtr);
@@ -16,9 +22,9 @@ package body ConfigTree is
       if Object.childFirst /= null then
          Free (Object.childFirst);
       end if;
-      -- Put_Line("Finalize Node: " & To_String(Object.name));
    end Finalize;
    
+   ---------------------------------------------------------------------------------------------------------------------
    function GetChild (Object : in out Node; path : String) return NodePtr is
       str   : Unbounded_String := To_Unbounded_String (path);
       pos   : Natural := Index (str, ".", 1);
@@ -35,8 +41,6 @@ package body ConfigTree is
          last := str;
          Delete (last, 1, pos);
       end if;
---      Put_Line("First: " & To_String(first));
---      Put_Line ("Last: " & To_String (last));
       
       if Length (first) > 0 then
          while node /= null loop
@@ -52,16 +56,19 @@ package body ConfigTree is
       return node;
    end GetChild;
    
+   ---------------------------------------------------------------------------------------------------------------------
    function GetFirst(Object : in out Node) return NodePtr is
    begin
       return Object.childFirst;
    end GetFirst;
    
+   ---------------------------------------------------------------------------------------------------------------------
    function GetNext(Object : in out Node) return NodePtr is
    begin
       return Object.next;
    end GetNext;
    
+   ---------------------------------------------------------------------------------------------------------------------
    function GetValue (Object : in out Node; path : in String; default : in String := "") return String is
       node : NodePtr;
    begin
@@ -72,7 +79,6 @@ package body ConfigTree is
       return default;
    end GetValue;
 
-   
    ---------------------------------------------------------------------------------------------------------------------
    procedure Finalize (Object : in out Tree) is
    begin
@@ -82,17 +88,20 @@ package body ConfigTree is
       -- Put_Line("Finalize ConfigTree");
    end Finalize;
    
+   ---------------------------------------------------------------------------------------------------------------------
    procedure Initialize (Object : in out Tree) is
    begin
       Object.root.name := To_Unbounded_String("root");
       SaxParser.Parse(Object.root);
    end Initialize;
    
+   ---------------------------------------------------------------------------------------------------------------------
    function GetChild (Object : in out Tree; path : in String) return NodePtr is
    begin
       return Object.root.GetChild (path);
    end GetChild;
    
+   ---------------------------------------------------------------------------------------------------------------------
    function GetValue (Object : in out Tree; path : in String; default : in String := "") return String is
    begin
       return Object.root.GetValue (path, default);

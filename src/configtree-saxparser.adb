@@ -1,3 +1,8 @@
+----------------------------------------
+-- Copyright (C) 2019 Dmitriy Shadrin --
+-- All rights reserved.               --
+----------------------------------------
+
 with Sax.Readers;        use Sax.Readers;
 with Input_Sources.File; use Input_Sources.File;
 with Unicode.CES;
@@ -7,15 +12,17 @@ with Sax.Symbols;
 with Ada.Text_IO;    use Ada.Text_IO;
 with Ada.Exceptions;
 
+------------------------------------------------------------------------------------------------------------------------
 package body ConfigTree.SaxParser is
 
    ---------------------------------------------------------------------------------------------------------------------
    type Reader is new Sax.Readers.Reader with
       record
-         parent : NodePtr;
+         parent  : NodePtr;
          current : NodePtr;
       end record;
 
+   ---------------------------------------------------------------------------------------------------------------------
    procedure Start_Element
      (Handler       : in out Reader;
       Namespace_URI : Unicode.CES.Byte_Sequence := "";
@@ -23,12 +30,14 @@ package body ConfigTree.SaxParser is
       Qname         : Unicode.CES.Byte_Sequence := "";
       Atts          : Sax.Attributes.Attributes'Class);
 
+   ---------------------------------------------------------------------------------------------------------------------
    procedure End_Element
-     (Handler : in out Reader;
+     (Handler       : in out Reader;
       Namespace_URI : Unicode.CES.Byte_Sequence := "";
       Local_Name    : Unicode.CES.Byte_Sequence := "";
       Qname         : Unicode.CES.Byte_Sequence := "");
 
+   ---------------------------------------------------------------------------------------------------------------------
    procedure Characters
      (Handler : in out Reader;
       Ch      : Unicode.CES.Byte_Sequence);
@@ -69,7 +78,7 @@ package body ConfigTree.SaxParser is
 
    ---------------------------------------------------------------------------------------------------------------------
    procedure End_Element
-     (Handler : in out Reader;
+     (Handler       : in out Reader;
       Namespace_URI : Unicode.CES.Byte_Sequence := "";
       Local_Name    : Unicode.CES.Byte_Sequence := "";
       Qname         : Unicode.CES.Byte_Sequence := "") is

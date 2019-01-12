@@ -1,7 +1,16 @@
-with Ada.Finalization;
+----------------------------------------
+-- Copyright (C) 2019 Dmitriy Shadrin --
+-- All rights reserved.               --
+----------------------------------------
 
+with Ada.Finalization;
+with Formatted_Output; use Formatted_Output;
+with Formatted_Output.Integer_Output;
+
+------------------------------------------------------------------------------------------------------------------------
 package Pal is
 
+   ---------------------------------------------------------------------------------------------------------------------
    subtype int8_t  is Integer range -2 **  7 .. 2 **  7 - 1;
    subtype int16_t is Integer range -2 ** 15 .. 2 ** 15 - 1;
    subtype int32_t is Integer range -2 ** 31 .. 2 ** 31 - 1;
@@ -14,7 +23,12 @@ package Pal is
 
    subtype bool is Boolean;
 
+   ---------------------------------------------------------------------------------------------------------------------
+   package Formatter_Integer is new Formatted_Output.Integer_Output (Integer);
+   use Formatter_Integer;
 
+
+   ---------------------------------------------------------------------------------------------------------------------
    generic
       type TypeName is tagged private;
       type SharedObject is access all TypeName;
