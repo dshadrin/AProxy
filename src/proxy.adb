@@ -6,60 +6,66 @@
 with Ada.Unchecked_Deallocation;
 with Ada.Text_IO; use Ada.Text_IO;
 with ConfigTree; use ConfigTree;
+with TimeStamp;
 
 ------------------------------------------------------------------------------------------------------------------------
 package body Proxy is
 
-   procedure Free is new Ada.Unchecked_Deallocation(Configurator, ConfiguratorPtr);
-   procedure Free is new Ada.Unchecked_Deallocation(Manager, ManagerPtr);
+   procedure Free is new Ada.Unchecked_Deallocation (Configurator, ConfiguratorPtr);
+   procedure Free is new Ada.Unchecked_Deallocation (Manager, ManagerPtr);
 
    ---------------------------------
    -- Configurator implementation --
    ---------------------------------
    procedure Initialize (Object : in out Configurator) is
    begin
-      Put_Line("Init Configurator");
+      Put_Line ("Init Configurator");
    end Initialize;
    
    ---------------------------------------------------------------------------------------------------------------------
    procedure Finalize (Object : in out Configurator) is
    begin
-      Put_Line("Stop Configurator");
+      Put_Line ("Delete Configurator");
    end Finalize;
    
    ---------------------------------------------------------------------------------------------------------------------
-   function GetChild (ptr : in ConfiguratorPtr; path : in String) return NodePtr is
+   function GetChild (ptr : in out Configurator; path : in String) return NodePtr is
    begin
-      return ptr.data.GetChild(path);
+      return ptr.data.GetChild (path);
    end GetChild;
    
    ---------------------------------------------------------------------------------------------------------------------
-   function GetValue (ptr : in ConfiguratorPtr; path : in String; default : in String := "") return String is
+   function GetValue (ptr : in out Configurator; path : in String; default : in String := "") return String is
    begin
-      return ptr.data.GetValue(path, default);
+      return ptr.data.GetValue (path, default);
    end GetValue;
          
    ---------------------------------
    -- Manager implementation      --
    ---------------------------------
    procedure Initialize (Object : in out Manager) is
+      loggerConfig : NodePtr;
    begin
-      Put_Line("Init Manager");
+      Put_Line ("Init Manager");
       Object.config := new Configurator;
+      loggerConfig := Object.config.GetChild ("proxy.logger");
+      TimeStamp.SetTimeCorrectValue (Long_Integer'Value (Object.config.GetValue ("proxy.system.time_correct")));
+      Object.logger := Logging.StartLogger (loggerConfig);
    end Initialize;
    
    ---------------------------------------------------------------------------------------------------------------------
    procedure Finalize (Object : in out Manager) is
    begin
-      Free(Object.config); 
-      Put_Line("Stop Manager");
+      Logging.StopLogger;
+      Free (Object.config); 
+      Put_Line ("Delete Manager");
    end Finalize;
    
    ---------------------------------------------------------------------------------------------------------------------
    procedure Start (Object : in out Manager) is
       actors : NodePtr := GetConfig.data.GetChild ("proxy.actors");
    begin
-      if not IsNull(actors) then
+      if not IsNull (actors) then
          actors := null;
       end if;
       
@@ -70,6 +76,10 @@ package body Proxy is
    ---------------------------------
    function GetManager return ManagerPtr is
    begin
+      if mgrPtr = null then
+         mgrPtr := new Manager;
+      end if;
+      
       return mgrPtr;
    end GetManager;
 
@@ -82,11 +92,7 @@ package body Proxy is
    ---------------------------------------------------------------------------------------------------------------------
    procedure DeleteManager is
    begin
-      Free(mgrPtr);
+      Free (mgrPtr);
    end DeleteManager;
-
-begin
-   ---------------------------------------------------------------------------------------------------------------------
-   mgrPtr := new Manager;
 
 end Proxy;

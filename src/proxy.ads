@@ -6,17 +6,17 @@
 with Pal; use Pal;
 with Ada.Finalization;
 with ConfigTree;
+with Logging;
 
 ------------------------------------------------------------------------------------------------------------------------
 package Proxy is
-   pragma Elaborate_Body;
 
    ---------------------------------------------------------------------------------------------------------------------
-   type Configurator is limited private;
+   type Configurator is tagged limited private;
    type ConfiguratorPtr is access Configurator;
    
-   function GetChild(ptr : in ConfiguratorPtr; path : in String) return ConfigTree.NodePtr;
-   function GetValue(ptr : in ConfiguratorPtr; path : in String; default : in String := "") return String;
+   function GetChild (ptr : in out Configurator; path : in String) return ConfigTree.NodePtr;
+   function GetValue (ptr : in out Configurator; path : in String; default : in String := "") return String;
 
    ---------------------------------------------------------------------------------------------------------------------
    type Manager is tagged limited private;
@@ -49,6 +49,7 @@ private
    type Manager is new Ada.Finalization.Limited_Controlled with
       record
          config : ConfiguratorPtr;
+         logger : Logging.LoggerPtr;
       end record;
       
    procedure Initialize (Object : in out Manager);

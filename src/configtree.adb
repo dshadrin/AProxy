@@ -10,7 +10,7 @@ with ConfigTree.SaxParser;
 ------------------------------------------------------------------------------------------------------------------------
 package body ConfigTree is
 
-   procedure Free is new Unchecked_Deallocation(Node, NodePtr);
+   procedure Free is new Unchecked_Deallocation (Node, NodePtr);
    
    ---------------------------------------------------------------------------------------------------------------------
    procedure Finalize (Object : in out Node) is
@@ -50,20 +50,20 @@ package body ConfigTree is
       end if;
       
       if Length (last) > 0 then
-         node := node.GetChild(To_String(last));
+         node := node.GetChild (To_String (last));
       end if;
       
       return node;
    end GetChild;
    
    ---------------------------------------------------------------------------------------------------------------------
-   function GetFirst(Object : in out Node) return NodePtr is
+   function GetFirst (Object : in out Node) return NodePtr is
    begin
       return Object.childFirst;
    end GetFirst;
    
    ---------------------------------------------------------------------------------------------------------------------
-   function GetNext(Object : in out Node) return NodePtr is
+   function GetNext (Object : in out Node) return NodePtr is
    begin
       return Object.next;
    end GetNext;
@@ -74,11 +74,17 @@ package body ConfigTree is
    begin
       node := Object.GetChild (path);
       if not IsNull (node) then
-         return To_String(node.data);
+         return To_String (node.data);
       end if;
       return default;
    end GetValue;
 
+   ---------------------------------------------------------------------------------------------------------------------
+   function GetName (Object : in out Node; path : in String; default : in String := "") return String is
+   begin
+      return To_String (Object.name);
+   end GetName;
+   
    ---------------------------------------------------------------------------------------------------------------------
    procedure Finalize (Object : in out Tree) is
    begin
@@ -91,8 +97,8 @@ package body ConfigTree is
    ---------------------------------------------------------------------------------------------------------------------
    procedure Initialize (Object : in out Tree) is
    begin
-      Object.root.name := To_Unbounded_String("root");
-      SaxParser.Parse(Object.root);
+      Object.root.name := To_Unbounded_String ("root");
+      SaxParser.Parse (Object.root);
    end Initialize;
    
    ---------------------------------------------------------------------------------------------------------------------
@@ -108,7 +114,7 @@ package body ConfigTree is
    end GetValue;
    
    ---------------------------------------------------------------------------------------------------------------------
-   function IsNull(ptr : in NodePtr) return Boolean is
+   function IsNull (ptr : in NodePtr) return Boolean is
    begin
       return ptr = null;
    end IsNull;

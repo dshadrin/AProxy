@@ -10,6 +10,8 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 ------------------------------------------------------------------------------------------------------------------------
 package TimeStamp is
 
+   procedure SetTimeCorrectValue (val : in Long_Integer);
+
    ---------------------------------------------------------------------------------------------------------------------
    type timespec is
       record
@@ -37,8 +39,11 @@ package TimeStamp is
    procedure TimestampAdjust (tv : in out timespec; deltaMicrosec : Integer);
    procedure ConvertTimestamp (tv : in timespec; tmStruct : out tm; us : out Long_Integer; deltaMicrosec : Integer := 0);
    function GetTimestamp return timespec;
-   function GetTimestampStr(tmStruct : in tm; us : in Long_Integer) return String;
-   function GetTimestampStr(tv : in timespec) return String;
+   function GetTimestampStr (tmStruct : in tm; us : in Long_Integer) return String;
+   function GetTimestampStr (tv : in timespec) return String;
    function GetTimestampStr return String;
+
+private
+   TIME_CORRECT_VALUE : Long_Integer;
 
 end TimeStamp;

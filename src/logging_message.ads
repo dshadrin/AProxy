@@ -51,15 +51,23 @@ package Logging_Message is
    type SLogPackagePtr is access all SLogPackage;
    
    function "<" (lhd : access constant SLogPackage; rhd : access constant SLogPackage) return bool;
+   function "=" (lhd : access constant SLogPackage; rhd : access constant SLogPackage) return bool;
    
    ---------------------------------------------------------------------------------------------------------------------
    package SP is new Smart_Ptr (TypeName => SLogPackage, SharedObject => SLogPackagePtr);
    subtype LogMessage is SP.Shared_Ptr;
       
-   procedure LOG_INFO (tag : String; str : String; ch : int8_t := 0);
-      
-private
+   function "<" (lhd : in LogMessage; rhd : in LogMessage) return bool;
+   function "=" (lhd : in LogMessage; rhd : in LogMessage) return bool;
 
-   procedure Log(sev : ESeverity; tag : String; str : String; ch : int8_t);
+   procedure LOG_INFO (tag : String; str : String; ch : int8_t := 0);
+   procedure LOG_WARN (tag : String; str : String; ch : int8_t := 0);
+   procedure LOG_DEBUG (tag : String; str : String; ch : int8_t := 0);
+   procedure LOG_ERR (tag : String; str : String; ch : int8_t := 0);
+   procedure LOG_TEST (tag : String; str : String; ch : int8_t := 0);
+   procedure LOG_TRACE (tag : String; str : String; ch : int8_t := 0);
+   
+private
+   procedure Log (sev : ESeverity; tag : String; str : String; ch : int8_t);
    
 end Logging_Message;
