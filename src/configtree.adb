@@ -26,31 +26,32 @@ package body ConfigTree is
    
    ---------------------------------------------------------------------------------------------------------------------
    function GetChild (Object : in out Node; path : String) return NodePtr is
-      str   : Unbounded_String := To_Unbounded_String (path);
-      pos   : Natural := Index (str, ".", 1);
-      first : Unbounded_String;
-      last  : Unbounded_String;
+      use type Ada.Strings.Unbounded.Unbounded_String;
+      str   : Ada.Strings.Unbounded.Unbounded_String := Ada.Strings.Unbounded.To_Unbounded_String (path);
+      pos   : Natural := Ada.Strings.Unbounded.Index (str, ".", 1);
+      first : Ada.Strings.Unbounded.Unbounded_String;
+      last  : Ada.Strings.Unbounded.Unbounded_String;
       node  : NodePtr := Object.childFirst;
    begin
       if pos = 0 then
          first := str;
       else
          if pos > 1 then
-            first := To_Unbounded_String (Slice (str, 1, pos - 1));
+            first := Ada.Strings.Unbounded.To_Unbounded_String (Ada.Strings.Unbounded.Slice (str, 1, pos - 1));
          end if;
          last := str;
-         Delete (last, 1, pos);
+         Ada.Strings.Unbounded.Delete (last, 1, pos);
       end if;
       
-      if Length (first) > 0 then
+      if Ada.Strings.Unbounded.Length (first) > 0 then
          while node /= null loop
             exit when first = node.name;
             node := node.next;
          end loop;
       end if;
       
-      if Length (last) > 0 then
-         node := node.GetChild (To_String (last));
+      if Ada.Strings.Unbounded.Length (last) > 0 then
+         node := node.GetChild (Ada.Strings.Unbounded.To_String (last));
       end if;
       
       return node;
@@ -74,7 +75,7 @@ package body ConfigTree is
    begin
       node := Object.GetChild (path);
       if not IsNull (node) then
-         return To_String (node.data);
+         return Ada.Strings.Unbounded.To_String (node.data);
       end if;
       return default;
    end GetValue;
@@ -82,7 +83,7 @@ package body ConfigTree is
    ---------------------------------------------------------------------------------------------------------------------
    function GetName (Object : in out Node; path : in String; default : in String := "") return String is
    begin
-      return To_String (Object.name);
+      return Ada.Strings.Unbounded.To_String (Object.name);
    end GetName;
    
    ---------------------------------------------------------------------------------------------------------------------
@@ -97,7 +98,7 @@ package body ConfigTree is
    ---------------------------------------------------------------------------------------------------------------------
    procedure Initialize (Object : in out Tree) is
    begin
-      Object.root.name := To_Unbounded_String ("root");
+      Object.root.name := Ada.Strings.Unbounded.To_Unbounded_String ("root");
       SaxParser.Parse (Object.root);
    end Initialize;
    

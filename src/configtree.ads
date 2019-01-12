@@ -4,7 +4,7 @@
 ----------------------------------------
 
 with Ada.Finalization;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded; --use Ada.Strings.Unbounded;
 
 ------------------------------------------------------------------------------------------------------------------------
 package ConfigTree is
@@ -35,8 +35,8 @@ private
          next        : NodePtr;  -- reference to next node on the same level
          childFirst  : NodePtr;  -- list of childs (reference to first child)
          childLast   : NodePtr;  -- list of childs (reference to last child)
-         name        : Unbounded_String;   -- name of node
-         data        : Unbounded_String;   -- data
+         name        : Ada.Strings.Unbounded.Unbounded_String;   -- name of node
+         data        : Ada.Strings.Unbounded.Unbounded_String;   -- data
       end record;
    
    procedure Finalize (Object : in out Node);

@@ -72,7 +72,7 @@ package body ConfigTree.SaxParser is
          Handler.parent := Handler.current;
       end if;
       Handler.current := temp;
-      Handler.current.name := To_Unbounded_String (Qname);
+      Handler.current.name := Ada.Strings.Unbounded.To_Unbounded_String (Qname);
       -- Put_Line("Start_Element: " & To_String(To_Unbounded_String(Qname)));
    end Start_Element;
 
@@ -83,23 +83,25 @@ package body ConfigTree.SaxParser is
       Local_Name    : Unicode.CES.Byte_Sequence := "";
       Qname         : Unicode.CES.Byte_Sequence := "") is
       x : Integer := 0;
+      use type Ada.Strings.Unbounded.Unbounded_String;
    begin
-      if Handler.current.name = To_Unbounded_String (Qname) then
+      if Handler.current.name = Ada.Strings.Unbounded.To_Unbounded_String (Qname) then
          Handler.current := Handler.parent;
          Handler.parent := Handler.current.parent;
       else
          raise Program_Error;
       end if;
-      -- Put_Line("End_Element: " & To_String(To_Unbounded_String(Qname)));
+      -- Put_Line("End_Element: " & Ada.Strings.Unbounded.To_String(Ada.Strings.Unbounded.To_Unbounded_String(Qname)));
    end End_Element;
 
    ---------------------------------------------------------------------------------------------------------------------
    procedure Characters
      (Handler : in out Reader;
       Ch      : Unicode.CES.Byte_Sequence) is
+      use type Ada.Strings.Unbounded.Unbounded_String;
    begin
-      Handler.current.data := Handler.current.data & To_Unbounded_String(Ch);
-      -- Put_Line("Characters: " & To_String(Handler.current.data));
+      Handler.current.data := Handler.current.data & Ada.Strings.Unbounded.To_Unbounded_String (Ch);
+      -- Put_Line("Characters: " & Ada.Strings.Unbounded.To_String(Handler.current.data));
    end Characters;
 
    ---------------------------------------------------------------------------------------------------------------------
@@ -112,7 +114,7 @@ package body ConfigTree.SaxParser is
       Open ("proxy.xml", input);
 
 
-      Set_Feature(saxReader, Namespace_Prefixes_Feature, False);
+      Set_Feature (saxReader, Namespace_Prefixes_Feature, False);
       Set_Feature (saxReader, Namespace_Feature, False);
       Set_Feature (saxReader, Validation_Feature, False);
 
