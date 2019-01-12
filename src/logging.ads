@@ -5,19 +5,20 @@
 
 with Pal;
 with ConfigTree;
+with Sinks;
 with Logging_Message; use Logging_Message;
 with Ada.Containers.Ordered_Multisets;
 with Ada.Containers.Vectors;
 
 ------------------------------------------------------------------------------------------------------------------------
 package Logging is
-
-   ---------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
    procedure SendLogMessage (msg : LogMessage);
 
    ---------------------------------------------------------------------------------------------------------------------
    package LogsMultiset is new Ada.Containers.Ordered_Multisets (LogMessage);
    package LogsVector is new Ada.Containers.Vectors (Pal.uint32_t, LogMessage);
+   type SinksArray is array (1 .. 10) of access Sinks.Sink'Class;
 
    protected type LogRecords is
 
@@ -40,7 +41,7 @@ package Logging is
    type LoggerPtr is access Logger;
 
    procedure Init (lg : in out Logger; cfg : in ConfigTree.NodePtr);
-   procedure CreateSinks (lg : in out Logger; cgf : in ConfigTree.NodePtr);
+   procedure CreateSinks (lg : in out Logger; cfg : in ConfigTree.NodePtr);
 
    function StartLogger (cfg : in ConfigTree.NodePtr) return LoggerPtr;
    procedure StopLogger;
@@ -56,9 +57,10 @@ package Logging is
 private
    type Logger is tagged limited
       record
-         isWorked : Pal.bool;
-         logs     : LogRecords;
-         mp       : LogMultiplexer;
+         isWorked   : Pal.bool;
+         logs       : LogRecords;
+         mp         : LogMultiplexer;
+         sArray     : SinksArray;
       end record;
 
    ---------------------------------------------------------------------------------------------------------------------

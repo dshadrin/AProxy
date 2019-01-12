@@ -24,11 +24,13 @@ package Logging_Message is
    for ESeverity'Size use int8_t'Size;
    
    ---------------------------------------------------------------------------------------------------------------------
-   LOG_UNKNOWN_CHANNEL : int8_t := -1;
-   LOG_INTERNAL_CHANNEL : int8_t := 0;
-   LOG_UART_FILTERED_CHANNEL : int8_t := 1;
-   LOG_UART_RAW_CHANNEL : int8_t := 2;
-   LOG_CLIENT_CHANNEL : int8_t := 3;
+   type LogChannel is new Pal.int8_t;
+   
+   LOG_UNKNOWN_CHANNEL :  constant LogChannel := -1;
+   LOG_INTERNAL_CHANNEL : constant LogChannel := 0;
+   LOG_UART_FILTERED_CHANNEL : constant LogChannel := 1;
+   LOG_UART_RAW_CHANNEL : constant LogChannel := 2;
+   LOG_CLIENT_CHANNEL : constant LogChannel := 3;
    
    G_TagSize : constant uint32_t := 4;
    G_MaxMessageSize : constant uint32_t := 4096;
@@ -45,7 +47,7 @@ package Logging_Message is
          tm_stamp : TimeStamp.timespec;
          command  : ELogCommand;
          severity : ESeverity;
-         lchannel : int8_t;
+         lchannel : LogChannel;
       end record;
    
    type SLogPackagePtr is access all SLogPackage;
@@ -60,14 +62,14 @@ package Logging_Message is
    function "<" (lhd : in LogMessage; rhd : in LogMessage) return bool;
    function "=" (lhd : in LogMessage; rhd : in LogMessage) return bool;
 
-   procedure LOG_INFO (tag : String; str : String; ch : int8_t := 0);
-   procedure LOG_WARN (tag : String; str : String; ch : int8_t := 0);
-   procedure LOG_DEBUG (tag : String; str : String; ch : int8_t := 0);
-   procedure LOG_ERR (tag : String; str : String; ch : int8_t := 0);
-   procedure LOG_TEST (tag : String; str : String; ch : int8_t := 0);
-   procedure LOG_TRACE (tag : String; str : String; ch : int8_t := 0);
+   procedure LOG_INFO (tag : String; str : String; ch : LogChannel := 0);
+   procedure LOG_WARN (tag : String; str : String; ch : LogChannel := 0);
+   procedure LOG_DEBUG (tag : String; str : String; ch : LogChannel := 0);
+   procedure LOG_ERR (tag : String; str : String; ch : LogChannel := 0);
+   procedure LOG_TEST (tag : String; str : String; ch : LogChannel := 0);
+   procedure LOG_TRACE (tag : String; str : String; ch : LogChannel := 0);
    
 private
-   procedure Log (sev : ESeverity; tag : String; str : String; ch : int8_t);
+   procedure Log (sev : ESeverity; tag : String; str : String; ch : LogChannel);
    
 end Logging_Message;

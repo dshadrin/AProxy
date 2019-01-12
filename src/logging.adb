@@ -9,12 +9,13 @@ with Ada.Text_IO; use Ada.Text_IO;
 with TimeStamp;
 with Ada.Strings.Unbounded;
 with Ada.Unchecked_Deallocation;
+with Sinks;
 
 ------------------------------------------------------------------------------------------------------------------------
 package body Logging is
 
-   LOG_OUTPUT_DELAY_MS     : Integer := 2500;
-   LOG_OUTPUT_TIMER_PERIOD : Duration := 1.5;
+   LOG_OUTPUT_DELAY_MS     : constant Integer := 2500;
+   LOG_OUTPUT_TIMER_PERIOD : constant Duration := 1.5;
    
    ---------------------------------------------------------------------------------------------------------------------
    function SeverityStr (sev : ESeverity) return String is
@@ -51,7 +52,7 @@ package body Logging is
    ---------------------------------------------------------------------------------------------------------------------
    protected body LogRecords is
       
-      ------------------------------------------------------------------------------------------------------------------
+   ------------------------------------------------------------------------------------------------------------------
       entry Push (item : in LogMessage) when true is
       begin
          if isWorked then
@@ -130,15 +131,24 @@ package body Logging is
    procedure Init (lg : in out Logger; cfg : in ConfigTree.NodePtr) is
       sinksCfg : ConfigTree.NodePtr;
    begin
+      lg.sArray := (null, null, null, null, null, null, null, null, null, null);
       sinksCfg := cfg.GetChild ("sinks");
       lg.CreateSinks (sinksCfg);
       lg.mp.Start;
    end Init;
    
    ---------------------------------------------------------------------------------------------------------------------
-   procedure CreateSinks (lg : in out Logger; cgf : in ConfigTree.NodePtr) is
+   procedure CreateSinks (lg : in out Logger; cfg : in ConfigTree.NodePtr) is
+      nd  : ConfigTree.NodePtr := cfg.GetFirst;
+      sk  : access Sinks.Sink'Class := null;
+      str : String (1 .. 7) := "";
    begin
-      null;
+      while not ConfigTree.IsNull (nd) loop
+         str := nd.GetValue ("name");
+         sk := Sinks.MakeSink (str, nd);
+         nd := cfg.GetNext;
+      end loop;
+      
    end CreateSinks;
       
    ---------------------------------------------------------------------------------------------------------------------

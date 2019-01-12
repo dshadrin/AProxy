@@ -37,7 +37,7 @@ package body Logging_Message is
    end;
 
    ---------------------------------------------------------------------------------------------------------------------
-   procedure Log (sev : ESeverity; tag : String; str : String; ch : int8_t) is
+   procedure Log (sev : ESeverity; tag : String; str : String; ch : LogChannel) is
       ptr : SLogPackagePtr := new SLogPackage;
       msg : LogMessage;
    begin
@@ -47,37 +47,37 @@ package body Logging_Message is
    end Log;
 
    ---------------------------------------------------------------------------------------------------------------------
-   procedure LOG_INFO (tag : String; str : String; ch : int8_t := 0) is
+   procedure LOG_INFO (tag : String; str : String; ch : LogChannel := 0) is
    begin
       Log (eInfo, tag, str, ch);
    end LOG_INFO;
    
    ---------------------------------------------------------------------------------------------------------------------
-   procedure LOG_WARN (tag : String; str : String; ch : int8_t := 0) is
+   procedure LOG_WARN (tag : String; str : String; ch : LogChannel := 0) is
    begin
       Log (eWarn, tag, str, ch);
    end LOG_WARN;
 
    ---------------------------------------------------------------------------------------------------------------------
-   procedure LOG_DEBUG (tag : String; str : String; ch : int8_t := 0) is
+   procedure LOG_DEBUG (tag : String; str : String; ch : LogChannel := 0) is
    begin
       Log (eDebug, tag, str, ch);
    end LOG_DEBUG;
 
    ---------------------------------------------------------------------------------------------------------------------
-   procedure LOG_ERR (tag : String; str : String; ch : int8_t := 0) is
+   procedure LOG_ERR (tag : String; str : String; ch : LogChannel := 0) is
    begin
       Log (eError, tag, str, ch);
    end LOG_ERR;
 
    ---------------------------------------------------------------------------------------------------------------------
-   procedure LOG_TEST (tag : String; str : String; ch : int8_t := 0) is
+   procedure LOG_TEST (tag : String; str : String; ch : LogChannel := 0) is
    begin
       Log (eTest, tag, str, ch);
    end LOG_TEST;
 
    ---------------------------------------------------------------------------------------------------------------------
-   procedure LOG_TRACE (tag : String; str : String; ch : int8_t := 0) is
+   procedure LOG_TRACE (tag : String; str : String; ch : LogChannel := 0) is
    begin
       Log (eTrace, tag, str, ch);
    end LOG_TRACE;

@@ -3,21 +3,16 @@
 -- All rights reserved.               --
 ----------------------------------------
 
-with Ada.Text_IO; use Ada.Text_IO;
-with Pal; use Pal;
-with Proxy;
-with TimeStamp; use TimeStamp;
-with Interfaces.C;
 with Logging_Message; use Logging_Message;
-with Formatted_Output; use Formatted_Output;
+with Ada.Text_IO; use Ada.Text_IO;
+with Proxy;
 
 ------------------------------------------------------------------------------------------------------------------------
 procedure Monitor is
    ptr : Proxy.ManagerPtr := Proxy.GetManager;
 begin
    ptr.Start;
-   LOG_INFO("LOG ", "Start Manager");
-
+   LOG_INFO ("LOG ", "Start Manager");
 
    loop
       declare
@@ -27,7 +22,7 @@ begin
       end;
    end loop;
 
-   LOG_INFO("LOG ", "Stop Manager");
+   LOG_INFO ("LOG ", "Stop Manager");
    Proxy.DeleteManager;
    ptr := null;
 end Monitor;
