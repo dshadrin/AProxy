@@ -12,6 +12,7 @@ package body Pal is
    package body Smart_Ptr is
 
       procedure Free is new Ada.Unchecked_Deallocation (TypeName, SharedObject);
+      procedure Free is new Ada.Unchecked_Deallocation (uint32_t, uint32_Ptr);
 
       ------------------------------------------------------------------------------------------------------------------
       function Sync_Sub_And_Fetch(Reference : not null access uint32_t;
@@ -44,6 +45,7 @@ package body Pal is
       begin
          if Sync_Sub_And_Fetch (obj.pn, 1) = 0 then
             Free(obj.pt);
+            Free(obj.pn);
          end if;
       end Finalize;
 

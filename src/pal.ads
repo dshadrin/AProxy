@@ -41,11 +41,12 @@ package Pal is
       function Make_Shared (ptr : in SharedObject) return Shared_Ptr;
 
    private
+      type uint32_Ptr is access uint32_t;
 
       type Shared_Ptr is new Ada.Finalization.Controlled with
          record
             pt : SharedObject;
-            pn : aliased access uint32_t;
+            pn : uint32_Ptr;
             pragma Atomic (pn);
             pragma Volatile(pn);
          end record;
