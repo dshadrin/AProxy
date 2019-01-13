@@ -13,6 +13,18 @@ package body ConfigTree is
    procedure Free is new Unchecked_Deallocation (Node, NodePtr);
    
    ---------------------------------------------------------------------------------------------------------------------
+   procedure Initialize (Object : in out Node) is
+   begin
+      Object.parent := null;
+      Object.next := null;
+      Object.previous := null;
+      Object.childFirst := null;
+      Object.childLast := null;
+      Object.name := Ada.Strings.Unbounded.To_Unbounded_String ("");
+      Object.data := Ada.Strings.Unbounded.To_Unbounded_String ("");
+   end Initialize;
+   
+   ---------------------------------------------------------------------------------------------------------------------
    procedure Finalize (Object : in out Node) is
    begin
       
@@ -98,6 +110,7 @@ package body ConfigTree is
    ---------------------------------------------------------------------------------------------------------------------
    procedure Initialize (Object : in out Tree) is
    begin
+      Object.root := new Node;
       Object.root.name := Ada.Strings.Unbounded.To_Unbounded_String ("root");
       SaxParser.Parse (Object.root);
    end Initialize;

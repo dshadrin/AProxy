@@ -52,25 +52,17 @@ package body ConfigTree.SaxParser is
    is
       temp : NodePtr := new Node;
    begin
-      if Handler.current = null then
-         -- add next parent child
-         if Handler.parent.childFirst = null then
-            Handler.parent.childFirst := temp;
-         else
-            Handler.parent.childLast.next := temp;
-         end if;
-         Handler.parent.childLast := temp;
-         temp.parent := Handler.parent;
-      else
-         if Handler.current.childFirst = null then
-            Handler.current.childFirst := temp;
-         else
-            Handler.current.childLast.next := temp;
-         end if;
+      if Handler.current.childFirst = null then
+         Handler.current.childFirst := temp;
          Handler.current.childLast := temp;
-         temp.parent := Handler.current;
-         Handler.parent := Handler.current;
+      else
+         Handler.current.childLast.next := temp;
+         temp.previous := Handler.current.childLast;
+         Handler.current.childLast := temp;
       end if;
+      temp.parent := Handler.current;
+      Handler.parent := Handler.current;
+
       Handler.current := temp;
       Handler.current.name := Ada.Strings.Unbounded.To_Unbounded_String (Qname);
       -- Put_Line("Start_Element: " & To_String(To_Unbounded_String(Qname)));
@@ -118,7 +110,8 @@ package body ConfigTree.SaxParser is
       Set_Feature (saxReader, Namespace_Feature, False);
       Set_Feature (saxReader, Validation_Feature, False);
 
-      saxReader.parent := root;
+      saxReader.parent := null;
+      saxReader.current := root;
       Parse (saxReader, input);
       Close (input);
    end Parse;

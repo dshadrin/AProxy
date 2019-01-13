@@ -131,6 +131,7 @@ package body Logging is
    procedure Init (lg : in out Logger; cfg : in ConfigTree.NodePtr) is
       sinksCfg : ConfigTree.NodePtr;
    begin
+      lg.sArraySize := 0;
       lg.sArray := (null, null, null, null, null, null, null, null, null, null);
       sinksCfg := cfg.GetChild ("sinks");
       lg.CreateSinks (sinksCfg);
@@ -139,14 +140,20 @@ package body Logging is
    
    ---------------------------------------------------------------------------------------------------------------------
    procedure CreateSinks (lg : in out Logger; cfg : in ConfigTree.NodePtr) is
+      use Ada.Strings.Unbounded;
       nd  : ConfigTree.NodePtr := cfg.GetFirst;
       sk  : access Sinks.Sink'Class := null;
-      str : String (1 .. 7) := "";
+      str : Unbounded_String;
    begin
       while not ConfigTree.IsNull (nd) loop
-         str := nd.GetValue ("name");
-         sk := Sinks.MakeSink (str, nd);
-         nd := cfg.GetNext;
+         str := To_Unbounded_String ( nd.GetValue ("name"));
+         sk := Sinks.MakeSink (To_String (str), nd);
+         if sk /= null then
+            lg.sArraySize := lg.sArraySize + 1;
+            lg.sArray (lg.sArraySize) := sk;
+         end if;
+         
+         nd := nd.GetNext;
       end loop;
       
    end CreateSinks;
@@ -170,6 +177,13 @@ package body Logging is
       loggerInstance.isWorked := false;
       loggerInstance.logs.WaitEmpty;
       loggerInstance.mp.Stop;
+      
+      for i in loggerInstance.sArray'Range loop
+         if loggerInstance.sArray (i) /= null then
+            loggerInstance.sArray (i).Close;
+         end if;
+      end loop;
+      
       Free (loggerInstance);
    end StopLogger;
    

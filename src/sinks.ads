@@ -16,10 +16,14 @@ package Sinks is
    
    procedure Write (self : in out Sink; log : in Logging_Message.LogMessage) is abstract;
    procedure SetProperty (self : in out Sink; name : in String; value : in String) is abstract;
+   procedure Close (self : in out Sink) is abstract;
+   
+   procedure SetCommonProperty (self : in out Sink; name : in String; value : in String);
    function Channel (self : in out Sink) return Logging_Message.LogChannel;
    
    procedure WriteLog (self : in out Sink'Class; log : in Logging_Message.LogMessage);
    procedure SetSinkProperty (self : in out Sink'Class; name : in String; value : in String);
+   procedure CloseSink (self : in out Sink'Class);
    
    function MakeSink (name : in String; cfg : in ConfigTree.NodePtr) return access Sink'Class;
    
@@ -37,6 +41,7 @@ private
    
    overriding procedure Write (self : in out ConsoleSink; log : in Logging_Message.LogMessage);
    overriding procedure SetProperty (self : in out ConsoleSink; name : in String; value : in String);
+   overriding procedure Close (self : in out ConsoleSink);
    
    type FileSink is new Sink with
       record
@@ -45,5 +50,6 @@ private
    
    overriding procedure Write (self : in out FileSink; log : in Logging_Message.LogMessage);
    overriding procedure SetProperty (self : in out FileSink; name : in String; value : in String);
+   overriding procedure Close (self : in out FileSink);
 
 end Sinks;

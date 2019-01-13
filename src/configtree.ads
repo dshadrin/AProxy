@@ -33,18 +33,20 @@ private
       record
          parent      : NodePtr;  -- parent node
          next        : NodePtr;  -- reference to next node on the same level
+         previous    : NodePtr;  -- reference to next node on the same level
          childFirst  : NodePtr;  -- list of childs (reference to first child)
          childLast   : NodePtr;  -- list of childs (reference to last child)
          name        : Ada.Strings.Unbounded.Unbounded_String;   -- name of node
          data        : Ada.Strings.Unbounded.Unbounded_String;   -- data
       end record;
    
+   procedure Initialize (Object : in out Node);
    procedure Finalize (Object : in out Node);
    
    ---------------------------------------------------------------------------------------------------------------------
    type Tree is new Ada.Finalization.Limited_Controlled with
       record
-         root : NodePtr := new Node;  -- reference to root node
+         root : NodePtr;  -- reference to root node
       end record;
 
    procedure Initialize (Object : in out Tree);

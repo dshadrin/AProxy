@@ -61,6 +61,7 @@ private
          logs       : LogRecords;
          mp         : LogMultiplexer;
          sArray     : SinksArray;
+         sArraySize : Pal.uint32_t;
       end record;
 
    ---------------------------------------------------------------------------------------------------------------------
