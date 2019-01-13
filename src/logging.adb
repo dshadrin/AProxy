@@ -40,7 +40,7 @@ package body Logging is
    begin
      
       if loggerInstance.isWorked then
-         if msg.Get_Object.lchannel /= LOG_UNKNOWN_CHANNEL then
+         if msg.Get.lchannel /= LOG_UNKNOWN_CHANNEL then
             loggerInstance.logs.Push (msg);
          else
             LOG_WARN ("LOG ", "Skip log message with unknown channel");
@@ -72,7 +72,7 @@ package body Logging is
             TimeStamp.TimestampAdjust (tm_stamp, -LOG_OUTPUT_DELAY_MS);
          
             lm := messages.First_Element;
-            while lm.Get_Object.tm_stamp < tm_stamp loop
+            while lm.Get.tm_stamp < tm_stamp loop
                items.Append (lm);
                messages.Delete_First;
                exit when messages.Is_Empty;
@@ -117,7 +117,7 @@ package body Logging is
                if not vec.Is_Empty then
                   -- TODO: send 'vec' to sinks
                   for count in vec.First_Index .. vec.Last_Index loop
-                     Put_Line (FormatMessage (SP.Get_Object (vec (count))));
+                     Put_Line (FormatMessage (vec (count).Get));
                   end loop;
                   
                end if;

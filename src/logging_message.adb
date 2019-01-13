@@ -27,13 +27,13 @@ package body Logging_Message is
    ---------------------------------------------------------------------------------------------------------------------
    function "<" (lhd : in LogMessage; rhd : in LogMessage) return bool is
    begin
-      return lhd.Get_Object.tm_stamp < rhd.Get_Object.tm_stamp;
+      return lhd.Get.tm_stamp < rhd.Get.tm_stamp;
    end;
    
    ---------------------------------------------------------------------------------------------------------------------
    function "=" (lhd : in LogMessage; rhd : in LogMessage) return bool is
    begin
-      return lhd.Get_Object.tm_stamp = rhd.Get_Object.tm_stamp;
+      return lhd.Get.tm_stamp = rhd.Get.tm_stamp;
    end;
 
    ---------------------------------------------------------------------------------------------------------------------

@@ -49,7 +49,7 @@ package body Proxy is
       Put_Line ("Init Manager");
       Object.config := new Configurator;
       loggerConfig := Object.config.GetChild ("proxy.logger");
-      TimeStamp.SetTimeCorrectValue (Long_Integer'Value (Object.config.GetValue ("proxy.system.time_correct")));
+      TimeStamp.SetTimeCorrectValue (Long_Integer'Value (Object.config.GetValue ("proxy.system.tz")));
       Object.logger := Logging.StartLogger (loggerConfig);
    end Initialize;
    

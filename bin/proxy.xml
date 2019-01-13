@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <proxy>
   <system>
-    <time_correct>-7200</time_correct>
+    <tz>36000</tz>
   </system>
   <logger>
       <severity>TRACE</severity>

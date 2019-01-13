@@ -15,14 +15,14 @@ package body Pal is
       procedure Free is new Ada.Unchecked_Deallocation (uint32_t, uint32_Ptr);
 
       ------------------------------------------------------------------------------------------------------------------
-      function Sync_Sub_And_Fetch(Reference : not null access uint32_t;
-                                  Increment : uint32_t) return uint32_t;
+      function Sync_Sub_And_Fetch (Reference : not null access uint32_t;
+                                   Increment : uint32_t) return uint32_t;
 
       pragma Import (Intrinsic, Sync_Sub_And_Fetch, "__sync_sub_and_fetch_4");
 
       ------------------------------------------------------------------------------------------------------------------
-      function Sync_Add_And_Fetch(Reference : not null access uint32_t;
-                                  Increment : uint32_t) return uint32_t;
+      function Sync_Add_And_Fetch (Reference : not null access uint32_t;
+                                   Increment : uint32_t) return uint32_t;
 
       pragma Import (Intrinsic, Sync_Add_And_Fetch, "__sync_add_and_fetch_4");
 
@@ -37,23 +37,23 @@ package body Pal is
       procedure Adjust (obj : in out Shared_Ptr) is
          var : uint32_t;
       begin
-         var := Sync_Add_And_Fetch(obj.pn, 1);
+         var := Sync_Add_And_Fetch (obj.pn, 1);
       end Adjust;
 
       ------------------------------------------------------------------------------------------------------------------
       procedure Finalize (obj : in out Shared_Ptr) is
       begin
          if Sync_Sub_And_Fetch (obj.pn, 1) = 0 then
-            Free(obj.pt);
-            Free(obj.pn);
+            Free (obj.pt);
+            Free (obj.pn);
          end if;
       end Finalize;
 
       ------------------------------------------------------------------------------------------------------------------
-      function Get_Object (obj : in Shared_Ptr) return SharedObject is
+      function Get (obj : in Shared_Ptr) return SharedObject is
       begin
          return obj.pt;
-      end Get_Object;
+      end Get;
 
       ------------------------------------------------------------------------------------------------------------------
       function Make_Shared (ptr : in SharedObject) return Shared_Ptr is

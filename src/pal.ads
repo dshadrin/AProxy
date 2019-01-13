@@ -37,7 +37,7 @@ package Pal is
 
       type Shared_Ptr is tagged private;
 
-      function Get_Object (obj : in Shared_Ptr) return SharedObject;
+      function Get (obj : in Shared_Ptr) return SharedObject;
       function Make_Shared (ptr : in SharedObject) return Shared_Ptr;
 
    private
