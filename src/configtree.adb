@@ -83,17 +83,22 @@ package body ConfigTree is
    
    ---------------------------------------------------------------------------------------------------------------------
    function GetValue (Object : in out Node; path : in String; default : in String := "") return String is
-      node : NodePtr;
+      node : NodePtr := Object.GetChild (path);
    begin
-      node := Object.GetChild (path);
       if not IsNull (node) then
          return Ada.Strings.Unbounded.To_String (node.data);
       end if;
       return default;
    end GetValue;
+   
+   ---------------------------------------------------------------------------------------------------------------------
+   function GetValue (Object : in out Node) return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.data);
+   end GetValue;
 
    ---------------------------------------------------------------------------------------------------------------------
-   function GetName (Object : in out Node; path : in String; default : in String := "") return String is
+   function GetName (Object : in out Node) return String is
    begin
       return Ada.Strings.Unbounded.To_String (Object.name);
    end GetName;

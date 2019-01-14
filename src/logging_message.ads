@@ -40,7 +40,7 @@ package Logging_Message is
    type ELogCommand is ( eMessage, eChangeFile, eStop );
    
    ---------------------------------------------------------------------------------------------------------------------
-   type SLogPackage is tagged
+   type SLogPackage is
       record
          message  : Ada.Strings.Unbounded.Unbounded_String;
          tag      : String (1 .. G_TagSize);

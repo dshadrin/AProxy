@@ -30,7 +30,7 @@ package Pal is
 
    ---------------------------------------------------------------------------------------------------------------------
    generic
-      type TypeName is tagged private;
+      type TypeName is private;
       type SharedObject is access all TypeName;
 
    package Smart_Ptr is

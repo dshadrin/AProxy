@@ -17,13 +17,12 @@ package Logging is
 
    ---------------------------------------------------------------------------------------------------------------------
    package LogsMultiset is new Ada.Containers.Ordered_Multisets (LogMessage);
-   package LogsVector is new Ada.Containers.Vectors (Pal.uint32_t, LogMessage);
-   type SinksArray is array (1 .. 10) of access Sinks.Sink'Class;
+   type SinksArray is array (1 .. 10) of aliased Sinks.Sink;
 
    protected type LogRecords is
 
       entry Push (item : in LogMessage);
-      entry Pop (items : out LogsVector.Vector);
+      entry Pop (items : in Sinks.LogMessages);
       entry WaitEmpty;
 
    private
@@ -41,15 +40,16 @@ package Logging is
    type LoggerPtr is access Logger;
 
    procedure Init (lg : in out Logger; cfg : in ConfigTree.NodePtr);
-   procedure CreateSinks (lg : in out Logger; cfg : in ConfigTree.NodePtr);
 
    function StartLogger (cfg : in ConfigTree.NodePtr) return LoggerPtr;
    procedure StopLogger;
 
+   procedure CreateSinks (sArray : access SinksArray; sArraySize : in out Pal.uint32_t; cfg : in ConfigTree.NodePtr);
+
    ---------------------------------------------------------------------------------------------------------------------
    task type LogMultiplexer is
 
-      entry Start;
+      entry Start(cfg : in ConfigTree.NodePtr);
       entry Stop;
 
    end LogMultiplexer;
@@ -60,8 +60,6 @@ private
          isWorked   : Pal.bool;
          logs       : LogRecords;
          mp         : LogMultiplexer;
-         sArray     : SinksArray;
-         sArraySize : Pal.uint32_t;
       end record;
 
    ---------------------------------------------------------------------------------------------------------------------

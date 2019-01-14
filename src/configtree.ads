@@ -18,7 +18,8 @@ package ConfigTree is
    function GetNext (Object : in out Node) return NodePtr;
    function GetChild (Object : in out Node; path : in String) return NodePtr;
    function GetValue (Object : in out Node; path : in String; default : in String := "") return String;
-   function GetName (Object : in out Node; path : in String; default : in String := "") return String;
+   function GetValue (Object : in out Node) return String;
+   function GetName (Object : in out Node) return String;
   
    ---------------------------------------------------------------------------------------------------------------------
    type Tree is tagged limited private;

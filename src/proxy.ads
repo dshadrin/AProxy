@@ -12,7 +12,7 @@ with Logging;
 package Proxy is
 
    ---------------------------------------------------------------------------------------------------------------------
-   type Configurator is tagged limited private;
+   type Configurator is limited private;
    type ConfiguratorPtr is access Configurator;
    
    function GetChild (ptr : in out Configurator; path : in String) return ConfigTree.NodePtr;
