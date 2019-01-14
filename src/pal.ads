@@ -6,6 +6,8 @@
 with Ada.Finalization;
 with Formatted_Output; use Formatted_Output;
 with Formatted_Output.Integer_Output;
+with Ada.Unchecked_Conversion;
+--with System.Atomic_Primitives
 
 --------------------------------------------------------------------------------
 package Pal is
@@ -23,10 +25,14 @@ package Pal is
 
    subtype bool is Boolean;
 
+   type AtomicMemorder is (ATOMIC_RELAXED, ATOMIC_CONSUME, ATOMIC_ACQUIRE, ATOMIC_RELEASE, ATOMIC_ACQ_REL, ATOMIC_SEQ_CST);
+   for AtomicMemorder'Size use Integer'Size;
+   for AtomicMemorder use (0, 1, 2, 3, 4, 5);
+   function MemorderCode is new Ada.Unchecked_Conversion (AtomicMemorder, Integer);
+
    -----------------------------------------------------------------------------
    package Formatter_Integer is new Formatted_Output.Integer_Output (Integer);
    use Formatter_Integer;
-
 
    -----------------------------------------------------------------------------
    function Sync_Sub_And_Fetch (Reference : not null access uint32_t;
@@ -39,6 +45,13 @@ package Pal is
                                 Increment : uint32_t) return uint32_t;
 
    pragma Import (Intrinsic, Sync_Add_And_Fetch, "__sync_add_and_fetch_4");
+
+
+   -- https://code.i-harness.com/ru/docs/gcc~7/_005f_005fatomic-builtins
+   function Atomic_Load_32 (src       : not null access uint32_t;
+                            memorder  : int32_t) return uint32_t;
+
+   pragma Import (Intrinsic, Atomic_Load_32, "__atomic_load_4");
 
    -----------------------------------------------------------------------------
    generic

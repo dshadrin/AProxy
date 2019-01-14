@@ -23,7 +23,7 @@ package body Pal is
 
       --------------------------------------------------------------------------
       procedure Adjust (obj : in out Shared_Ptr) is
-         var : uint32_t;
+         var : aliased uint32_t;
       begin
          var := Sync_Add_And_Fetch (obj.pn, 1);
       end Adjust;
