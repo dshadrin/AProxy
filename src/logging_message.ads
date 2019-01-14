@@ -8,7 +8,7 @@ with TimeStamp;
 with Ada.Strings.Unbounded;
 with Formatted_Output; use Formatted_Output;
 
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 package Logging_Message is
 
    type ESeverity is
@@ -23,7 +23,7 @@ package Logging_Message is
      );
    for ESeverity'Size use int8_t'Size;
    
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    type LogChannel is new Pal.int8_t;
    
    LOG_UNKNOWN_CHANNEL :  constant LogChannel := -1;
@@ -35,11 +35,11 @@ package Logging_Message is
    G_TagSize : constant uint32_t := 4;
    G_MaxMessageSize : constant uint32_t := 4096;
    
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    type ELoggingMode is ( eLoggingToServer, eNoLogging );
    type ELogCommand is ( eMessage, eChangeFile, eStop );
    
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    type SLogPackage is
       record
          message  : Ada.Strings.Unbounded.Unbounded_String;
@@ -52,22 +52,27 @@ package Logging_Message is
    
    type SLogPackagePtr is access all SLogPackage;
    
-   function "<" (lhd : access constant SLogPackage; rhd : access constant SLogPackage) return bool;
-   function "=" (lhd : access constant SLogPackage; rhd : access constant SLogPackage) return bool;
+   function "<" (lhd : access constant SLogPackage; rhd : access constant SLogPackage) return bool
+     with inline;
    
-   ---------------------------------------------------------------------------------------------------------------------
+   function "=" (lhd : access constant SLogPackage; rhd : access constant SLogPackage) return bool
+     with inline;
+   
+   -----------------------------------------------------------------------------
    package SP is new Smart_Ptr (TypeName => SLogPackage, SharedObject => SLogPackagePtr);
    subtype LogMessage is SP.Shared_Ptr;
       
-   function "<" (lhd : in LogMessage; rhd : in LogMessage) return bool;
-   function "=" (lhd : in LogMessage; rhd : in LogMessage) return bool;
+   function "<" (lhd : in LogMessage; rhd : in LogMessage) return bool with inline;
+   function "=" (lhd : in LogMessage; rhd : in LogMessage) return bool with inline;
 
-   procedure LOG_INFO (tag : String; str : String; ch : LogChannel := 0);
-   procedure LOG_WARN (tag : String; str : String; ch : LogChannel := 0);
-   procedure LOG_DEBUG (tag : String; str : String; ch : LogChannel := 0);
-   procedure LOG_ERR (tag : String; str : String; ch : LogChannel := 0);
-   procedure LOG_TEST (tag : String; str : String; ch : LogChannel := 0);
-   procedure LOG_TRACE (tag : String; str : String; ch : LogChannel := 0);
+   -----------------------------------------------------------------------------
+   procedure LOG_TRACE (tag : String; str : String; ch : LogChannel := 0) with inline;
+   procedure LOG_DEBUG (tag : String; str : String; ch : LogChannel := 0) with inline;
+   procedure LOG_INFO (tag : String; str : String; ch : LogChannel := 0) with inline;
+   procedure LOG_TEST (tag : String; str : String; ch : LogChannel := 0) with inline;
+   procedure LOG_WARN (tag : String; str : String; ch : LogChannel := 0) with inline;
+   procedure LOG_ERR (tag : String; str : String; ch : LogChannel := 0) with inline;
+   procedure LOG_CRIT (tag : String; str : String; ch : LogChannel := 0) with inline;
    
 private
    procedure Log (sev : ESeverity; tag : String; str : String; ch : LogChannel);

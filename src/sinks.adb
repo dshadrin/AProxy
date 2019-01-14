@@ -23,11 +23,13 @@ package body Sinks is
                                                            To_Unbounded_String ("TEST"),
                                                            To_Unbounded_String ("WARN"),
                                                            To_Unbounded_String ("ERROR"),
-                                                           To_Unbounded_String ("CRIT"));
+                                                          To_Unbounded_String ("CRIT"));
+   
+   type SeverityValueArray is array (ESeverity) of String (1 .. 4);
+   severityLogOutput : constant SeverityValueArray := ("TRAC", "DBG ", "INFO", "TEST", "WARN", "ERR ", "CRIT");
    
    -----------------------------------------------------------------------------
-   function SinkTypeStr (sev : ESinkType) return Ada.Strings.Unbounded.Unbounded_String
-   with inline is
+   function SinkTypeStr (sev : ESinkType) return Ada.Strings.Unbounded.Unbounded_String with inline is
    begin
       return sinkTypesStr (sev);
    end SinkTypeStr;
@@ -44,11 +46,9 @@ package body Sinks is
    end SeverityFromStr;
 
    -----------------------------------------------------------------------------
-   function SeverityStr (sev : ESeverity) return String is
-      type SeverityValueArray is array (ESeverity) of String (1 .. 4);
-      sevVal : constant SeverityValueArray := ("TRAC", "DBG ", "INFO", "TEST", "WARN", "ERR ", "CRIT");
+   function SeverityStr (sev : ESeverity) return String with inline is
    begin
-      return sevVal (sev);
+      return severityLogOutput (sev);
    end SeverityStr;
    
    -----------------------------------------------------------------------------

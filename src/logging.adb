@@ -120,7 +120,9 @@ package body Logging is
    end Init;
    
    -----------------------------------------------------------------------------
-   procedure CreateSinks (sArray : access SinksArray; sArraySize : in out Pal.uint32_t; cfg : in ConfigTree.NodePtr) is
+   procedure CreateSinks (sArray     : access SinksArray;
+                          sArraySize : in out Pal.uint32_t;
+                          cfg        : in ConfigTree.NodePtr) is
       use Ada.Strings.Unbounded;
       nd  : ConfigTree.NodePtr := cfg.GetFirst;
       str : Unbounded_String;

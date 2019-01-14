@@ -8,25 +8,25 @@ with Ada.Finalization;
 with ConfigTree;
 with Logging;
 
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 package Proxy is
 
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    type Configurator is limited private;
    type ConfiguratorPtr is access Configurator;
    
    function GetChild (ptr : in out Configurator; path : in String) return ConfigTree.NodePtr;
    function GetValue (ptr : in out Configurator; path : in String; default : in String := "") return String;
 
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    type Manager is tagged limited private;
    type ManagerPtr is access all Manager;
 
 
-   ---------------------------------------------------------------------------------------------------------------------
-   function GetManager return ManagerPtr;
-   function GetConfig return ConfiguratorPtr;
-   procedure DeleteManager;
+   -----------------------------------------------------------------------------
+   function GetManager return ManagerPtr with inline;
+   function GetConfig return ConfiguratorPtr with inline;
+   procedure DeleteManager with inline;
    procedure Start (Object : in out Manager);
    
 private

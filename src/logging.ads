@@ -10,12 +10,12 @@ with Logging_Message; use Logging_Message;
 with Ada.Containers.Ordered_Multisets;
 with Ada.Containers.Vectors;
 
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 package Logging is
----------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
    procedure SendLogMessage (msg : LogMessage);
 
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    package LogsMultiset is new Ada.Containers.Ordered_Multisets (LogMessage);
    type SinksArray is array (1 .. 10) of aliased Sinks.Sink;
 
@@ -35,7 +35,7 @@ package Logging is
 
    type LogRecordsPtr is access all LogRecords;
 
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    type Logger is tagged limited private;
    type LoggerPtr is access Logger;
 
@@ -44,9 +44,11 @@ package Logging is
    function StartLogger (cfg : in ConfigTree.NodePtr) return LoggerPtr;
    procedure StopLogger;
 
-   procedure CreateSinks (sArray : access SinksArray; sArraySize : in out Pal.uint32_t; cfg : in ConfigTree.NodePtr);
+   procedure CreateSinks (sArray     : access SinksArray;
+                          sArraySize : in out Pal.uint32_t;
+                          cfg        : in ConfigTree.NodePtr);
 
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    task type LogMultiplexer is
 
       entry Start(cfg : in ConfigTree.NodePtr);
@@ -62,7 +64,7 @@ private
          mp         : LogMultiplexer;
       end record;
 
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    loggerInstance : LoggerPtr;
 
 end Logging;

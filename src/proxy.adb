@@ -8,7 +8,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with ConfigTree; use ConfigTree;
 with TimeStamp;
 
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 package body Proxy is
 
    procedure Free is new Ada.Unchecked_Deallocation (Configurator, ConfiguratorPtr);
@@ -22,19 +22,19 @@ package body Proxy is
       Put_Line ("Init Configurator");
    end Initialize;
    
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    procedure Finalize (Object : in out Configurator) is
    begin
       Put_Line ("Delete Configurator");
    end Finalize;
    
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    function GetChild (ptr : in out Configurator; path : in String) return NodePtr is
    begin
       return ptr.data.GetChild (path);
    end GetChild;
    
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    function GetValue (ptr : in out Configurator; path : in String; default : in String := "") return String is
    begin
       return ptr.data.GetValue (path, default);
@@ -53,7 +53,7 @@ package body Proxy is
       Object.logger := Logging.StartLogger (loggerConfig);
    end Initialize;
    
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    procedure Finalize (Object : in out Manager) is
    begin
       Logging.StopLogger;
@@ -61,7 +61,7 @@ package body Proxy is
       Put_Line ("Delete Manager");
    end Finalize;
    
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    procedure Start (Object : in out Manager) is
       actors : NodePtr := GetConfig.data.GetChild ("proxy.actors");
    begin
@@ -83,13 +83,13 @@ package body Proxy is
       return mgrPtr;
    end GetManager;
 
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    function GetConfig return ConfiguratorPtr is
    begin
       return mgrPtr.config;
    end GetConfig;
    
-   ---------------------------------------------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------
    procedure DeleteManager is
    begin
       Free (mgrPtr);
