@@ -5,7 +5,6 @@
 
 with Ada.Calendar.Conversions;
 with Ada.Real_Time;
-with Proxy;
 with Formatted_Output; use Formatted_Output;
 with Formatted_Output.Integer_Output;
 
@@ -55,8 +54,8 @@ package body TimeStamp is
    begin
       if deltaMicrosec /= 0 then
          mcs := ((Long_Long_Integer (tv.tv_sec) rem ONE_SECOND_IN_MICROSECONDS) *
-                  ONE_SECOND_IN_MICROSECONDS) + Long_Long_Integer (tv.tv_nsec) +
-                  Long_Long_Integer (deltaMicrosec);
+                   ONE_SECOND_IN_MICROSECONDS) + Long_Long_Integer (tv.tv_nsec) +
+           Long_Long_Integer (deltaMicrosec);
 
          sec := ((Long_Long_Integer (tv.tv_sec) / ONE_SECOND_IN_MICROSECONDS) *
                    ONE_SECOND_IN_MICROSECONDS);
@@ -74,8 +73,8 @@ package body TimeStamp is
    end TimestampAdjust;
 
    -----------------------------------------------------------------------------
-   procedure ConvertTimestamp (tv       : in timespec;
-                               tmStruct : out tm;
+   procedure ConvertTimestamp (tv            : in timespec;
+                               tmStruct      : out tm;
                                us            : out Long_Integer;
                                deltaMicrosec : Integer := 0) is
       tv_temp : timespec := tv;

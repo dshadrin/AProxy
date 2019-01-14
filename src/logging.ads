@@ -51,7 +51,7 @@ package Logging is
    -----------------------------------------------------------------------------
    task type LogMultiplexer is
 
-      entry Start(cfg : in ConfigTree.NodePtr);
+      entry Start (cfg : in ConfigTree.NodePtr);
       entry Stop;
 
    end LogMultiplexer;
@@ -59,9 +59,9 @@ package Logging is
 private
    type Logger is tagged limited
       record
-         isWorked   : Pal.bool;
-         logs       : LogRecords;
-         mp         : LogMultiplexer;
+         isWorked    : Pal.bool;
+         logs        : LogRecords;
+         mp          : LogMultiplexer;
       end record;
 
    -----------------------------------------------------------------------------

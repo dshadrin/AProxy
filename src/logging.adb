@@ -6,9 +6,11 @@
 with Formatted_Output; use Formatted_Output;
 with Logging_Message; use Logging_Message;
 with TimeStamp;
+with Sinks;
 with Ada.Strings.Unbounded;
 with Ada.Unchecked_Deallocation;
-with Sinks;
+with Formatted_Output; use Formatted_Output;
+with Formatted_Output.Enumeration_Output;
 
 ------------------------------------------------------------------------------------------------------------------------
 package body Logging is
@@ -24,7 +26,8 @@ package body Logging is
          if msg.Get.lchannel /= LOG_UNKNOWN_CHANNEL then
             loggerInstance.logs.Push (msg);
          else
-            LOG_WARN ("LOG ", "Skip log message with unknown channel");
+            -- LOG_WARN ("LOG ", "Skip log message with unknown channel");
+            null;
          end if;
       end if;
       
@@ -33,7 +36,7 @@ package body Logging is
    -----------------------------------------------------------------------------
    protected body LogRecords is
       
-      --------------------------------------------------------------------------
+   --------------------------------------------------------------------------
       entry Push (item : in LogMessage) when true is
       begin
          if isWorked then
@@ -98,16 +101,20 @@ package body Logging is
             end Stop;
          else
             delay LOG_OUTPUT_TIMER_PERIOD;
-            declare
-               vec : Sinks.LogMessages := Sinks.LogsSP.Make_Shared(new Sinks.LogsVector.Vector);
-            begin
-               loggerInstance.logs.Pop (vec);
-               if not vec.Get.Is_Empty then
-                  for i in sArray'First .. sArraySize loop
-                     Sinks.WriteLogs (sArray (i)'Access, vec);
-                  end loop;
-               end if;
-            end;
+            if Pal.Atomic_Load_32 (Sinks.activeSinksCounter'Access) = 0 then
+               declare
+                  vec : Sinks.LogMessages := Sinks.LogsSP.Make_Shared (new Sinks.LogsVector.Vector);
+                  val : Pal.uint32_t := 0;
+               begin
+                  loggerInstance.logs.Pop (vec);
+                  if not vec.Get.Is_Empty then
+                     for i in sArray'First .. sArraySize loop
+                        val := Pal.Atomic_Add_Fetch_32 (Sinks.activeSinksCounter'Access, 1);
+                        Sinks.WriteLogs (sArray (i)'Access, vec);
+                     end loop;
+                  end if;
+               end;
+            end if;
          end select;
       end loop;
 
@@ -116,7 +123,7 @@ package body Logging is
    -----------------------------------------------------------------------------
    procedure Init (lg : in out Logger; cfg : in ConfigTree.NodePtr) is
    begin
-      lg.mp.Start(cfg);
+      lg.mp.Start (cfg);
    end Init;
    
    -----------------------------------------------------------------------------
@@ -124,13 +131,14 @@ package body Logging is
                           sArraySize : in out Pal.uint32_t;
                           cfg        : in ConfigTree.NodePtr) is
       use Ada.Strings.Unbounded;
+
       nd  : ConfigTree.NodePtr := cfg.GetFirst;
       str : Unbounded_String;
    begin
       while not ConfigTree.IsNull (nd) loop
          str := To_Unbounded_String ( nd.GetValue ("name"));
          sArraySize := sArraySize + 1;
-         Sinks.MakeSink (sArray(sArraySize), To_String (str), nd);
+         Sinks.MakeSink (sArray (sArraySize), To_String (str), nd);
          nd := nd.GetNext;
       end loop;
       
@@ -139,6 +147,7 @@ package body Logging is
    -----------------------------------------------------------------------------
    function StartLogger (cfg : in ConfigTree.NodePtr) return LoggerPtr is
    begin
+      Sinks.activeSinksCounter := 0;
       loggerInstance := new Logger;
       loggerInstance.isWorked := false;
       loggerInstance.Init (cfg);
@@ -158,5 +167,4 @@ package body Logging is
       Free (loggerInstance);
    end StopLogger;
    
-      
 end Logging;

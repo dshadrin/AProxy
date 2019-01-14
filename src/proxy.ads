@@ -26,6 +26,7 @@ package Proxy is
    -----------------------------------------------------------------------------
    function GetManager return ManagerPtr with inline;
    function GetConfig return ConfiguratorPtr with inline;
+   function GetLogger return Logging.LoggerPtr with inline;
    procedure DeleteManager with inline;
    procedure Start (Object : in out Manager);
    

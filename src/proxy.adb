@@ -94,5 +94,11 @@ package body Proxy is
    begin
       Free (mgrPtr);
    end DeleteManager;
+   
+   -----------------------------------------------------------------------------
+   function GetLogger return Logging.LoggerPtr is
+   begin
+      return mgrPtr.logger;
+   end GetLogger;
 
 end Proxy;

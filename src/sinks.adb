@@ -6,8 +6,10 @@
 with Logging_Message; use Logging_Message;
 with TimeStamp;
 with Ada.Characters.Handling;
+with Ada.Unchecked_Deallocation;
 with Ada.Text_IO; use Ada.Text_IO;
-with Formatted_Output;
+with Formatted_Output; use Formatted_Output;
+with Formatted_Output.Enumeration_Output;
 
 package body Sinks is
 
@@ -18,11 +20,11 @@ package body Sinks is
    
    type SeverityConfigureString is array (ESeverity) of Ada.Strings.Unbounded.Unbounded_String;
    sinkSeverityStr : constant SeverityConfigureString := (To_Unbounded_String ("TRACE"),
-                                                           To_Unbounded_String ("DEBUG"),
-                                                           To_Unbounded_String ("INFO"),
-                                                           To_Unbounded_String ("TEST"),
-                                                           To_Unbounded_String ("WARN"),
-                                                           To_Unbounded_String ("ERROR"),
+                                                          To_Unbounded_String ("DEBUG"),
+                                                          To_Unbounded_String ("INFO"),
+                                                          To_Unbounded_String ("TEST"),
+                                                          To_Unbounded_String ("WARN"),
+                                                          To_Unbounded_String ("ERROR"),
                                                           To_Unbounded_String ("CRIT"));
    
    type SeverityValueArray is array (ESeverity) of String (1 .. 4);
@@ -38,7 +40,7 @@ package body Sinks is
    function SeverityFromStr (str : String) return ESeverity is
    begin
       for i in ESeverity'Range loop
-         if To_Unbounded_String(str) = sinkSeverityStr(i) then
+         if To_Unbounded_String (str) = sinkSeverityStr (i) then
             return i;
          end if;
       end loop;
@@ -64,18 +66,24 @@ package body Sinks is
    
    -----------------------------------------------------------------------------
    procedure MakeSink (self : out Sink; name : in String; cfg : in ConfigTree.NodePtr) is
+      package Formatter_SinkType is new Formatted_Output.Enumeration_Output (Sinks.ESinkType);
       use Ada.Strings.Unbounded;
-      sinkName : Ada.Strings.Unbounded.Unbounded_String := Trim ( To_Unbounded_String (Ada.Characters.Handling.To_Upper (name)), Ada.Strings.Both);
+      use Formatter_SinkType;
+      use Logging_Message.Formatter_Channel;
+
+      sinkName : Unbounded_String := Trim ( To_Unbounded_String (Ada.Characters.Handling.To_Upper (name)), Ada.Strings.Both);
       severity : ESeverity := SeverityFromStr (cfg.GetValue ("severity"));
       channel  : LogChannel := LogChannel'Value (cfg.GetValue ("channel"));
    begin
+      self.severity := severity;
+      self.channel := channel;
       if sinkName = SinkTypeStr (CONSOLE_SINK) then
-         self := (CONSOLE_SINK, severity, channel);
+         self.SinkType := CONSOLE_SINK;
       elsif sinkName = SinkTypeStr (FILE_SINK) then
          declare
-            template : Ada.Strings.Unbounded.Unbounded_String := To_Unbounded_String ("");
-            prefix   : Ada.Strings.Unbounded.Unbounded_String := To_Unbounded_String ("");
-            suffix   : Ada.Strings.Unbounded.Unbounded_String := To_Unbounded_String ("");
+            template : Unbounded_String := Null_Unbounded_String;
+            prefix   : Unbounded_String := Null_Unbounded_String;
+            suffix   : Unbounded_String := Null_Unbounded_String;
             demand   : Pal.bool := false;
             nd       : ConfigTree.NodePtr := cfg.GetFirst;
          begin
@@ -91,11 +99,20 @@ package body Sinks is
                end if;
                nd := nd.GetNext;
             end loop;
-            self := (FILE_SINK, severity, channel, template, prefix, suffix, demand);
+            self.SinkType := FILE_SINK;
+            self.template := template;
+            self.prefix := prefix;
+            self.suffix := suffix;
+            self.filename := Null_Unbounded_String;
+            self.open_by_demand := demand;
          end;
       else
-         Put_Line("Unknown sink :" & To_String(sinkName));
+         Put_Line ("Unknown sink :" & To_String (sinkName));
+         raise Program_Error;
       end if;
+      self.handler := new SinkOutputer;
+      self.handler.Start (self.SinkType, severity, channel);
+      --LOG_INFO ("SINK", To_String (+"Created sink with channel %d : %s" & channel & self.SinkType));
    end MakeSink;
    
    -----------------------------------------------------------------------------
@@ -107,23 +124,61 @@ package body Sinks is
    -----------------------------------------------------------------------------
    procedure WriteLogs (self : access Sink; logs : in LogMessages) is
    begin
-      for i in logs.Get.First_Index..logs.Get.Last_Index loop
-         Write (self, logs.Get.Element(i));
-      end loop;
+      self.handler.Write (logs, self.filename);
    end WriteLogs;
-      
-   -----------------------------------------------------------------------------
-   procedure Write (self : access Sink; log : in Logging_Message.LogMessage) is
-   begin
-      if self.SinkType = CONSOLE_SINK then
-         Put_Line (FormatMessage (log.Get));
-      end if;
-   end Write;
    
+   -----------------------------------------------------------------------------
    procedure Close (self : access Sink) is
+      procedure Free is new Ada.Unchecked_Deallocation (SinkOutputer, SinkOutputerPtr);
    begin
-      null;
+      self.handler.Stop;
+      Free (self.handler);
    end Close;
    
+   -----------------------------------------------------------------------------
+   task body SinkOutputer is
+      isWorked : Pal.bool := true;
+      sinkTag  : ESinkType;
+      severity : Logging_Message.ESeverity;
+      channel  : Logging_Message.LogChannel;
+      var      : Pal.uint32_t;
+   begin
+      accept Start (tag : ESinkType;
+                    sev  : Logging_Message.ESeverity;
+                    ch   : Logging_Message.LogChannel) do
+         sinkTag := tag;
+         severity := sev;
+         channel := ch;
+      end Start;
+      
+      while isWorked loop
+         select
+            accept Write (logs : in LogMessages;
+                          file : in Ada.Strings.Unbounded.Unbounded_String := Ada.Strings.Unbounded.Null_Unbounded_String) do
+               for i in logs.Get.First_Index .. logs.Get.Last_Index loop
+                  declare
+                     msg : Logging_Message.LogMessage := logs.Get.Element (i);
+                  begin
+                     if msg.Get.lchannel = channel and then
+                       msg.Get.severity >= severity and then
+                       msg.Get.command = Logging_Message.eMessage then
+                        if sinkTag = CONSOLE_SINK then
+                           Put_Line (FormatMessage (msg.Get));
+                        elsif sinkTag = FILE_SINK then
+                           -- TODO: implement
+                           null;
+                        end if;
+                     end if;
+                  end;
+               end loop;
+               var := Pal.Atomic_Sub_Fetch_32 (activeSinksCounter'Access, 1);
+            end Write;
+         or
+            accept Stop do
+               isWorked := false;
+            end Stop;
+         end select;
+      end loop;
+   end SinkOutputer;
    
 end Sinks;

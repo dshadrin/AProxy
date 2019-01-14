@@ -7,6 +7,8 @@ with Pal; use Pal;
 with TimeStamp;
 with Ada.Strings.Unbounded;
 with Formatted_Output; use Formatted_Output;
+with Formatted_Output.Integer_Output;
+with Formatted_Output.Enumeration_Output;
 
 --------------------------------------------------------------------------------
 package Logging_Message is
@@ -25,6 +27,8 @@ package Logging_Message is
    
    -----------------------------------------------------------------------------
    type LogChannel is new Pal.int8_t;
+   
+   package Formatter_Channel is new Formatted_Output.Integer_Output (LogChannel);
    
    LOG_UNKNOWN_CHANNEL :  constant LogChannel := -1;
    LOG_INTERNAL_CHANNEL : constant LogChannel := 0;

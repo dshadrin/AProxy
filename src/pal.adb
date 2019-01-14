@@ -25,13 +25,13 @@ package body Pal is
       procedure Adjust (obj : in out Shared_Ptr) is
          var : aliased uint32_t;
       begin
-         var := Sync_Add_And_Fetch (obj.pn, 1);
+         var := Atomic_Add_Fetch_32 (obj.pn, 1);
       end Adjust;
 
       --------------------------------------------------------------------------
       procedure Finalize (obj : in out Shared_Ptr) is
       begin
-         if Sync_Sub_And_Fetch (obj.pn, 1) = 0 then
+         if Atomic_Sub_Fetch_32 (obj.pn, 1) = 0 then
             Free (obj.pt);
             Free (obj.pn);
          end if;
