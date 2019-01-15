@@ -12,6 +12,7 @@ with Formatted_Output.Integer_Output;
 package body TimeStamp is
 
    package Formatter_LongInteger is new Formatted_Output.Integer_Output (Long_Integer);
+   package Formatter_Integer is new Formatted_Output.Integer_Output (Integer);
    package Formatter_Cint is new Formatted_Output.Integer_Output (Interfaces.C.int);
    ONE_SECOND_IN_MICROSECONDS : constant Long_Long_Integer := 1000000;
 
@@ -100,10 +101,8 @@ package body TimeStamp is
 
    -----------------------------------------------------------------------------
    function GetTimestampStr (tmStruct : in tm; us : in Long_Integer) return String is
-      use Formatter_LongInteger;
-      use Formatter_Cint;
    begin
-      return To_String (+"%02d:%02d:%02d.%06d" & tmStruct.tm_hour & tmStruct.tm_min & tmStruct.tm_sec & us);
+      return FormatDateTime("%H:%M:%S.%06d", tmStruct, us);
    end GetTimestampStr;
 
    -----------------------------------------------------------------------------
@@ -120,5 +119,54 @@ package body TimeStamp is
    begin
       return GetTimestampStr (GetTimestamp);
    end GetTimestampStr;
+
+   -----------------------------------------------------------------------------
+   function FormatDateTime (fmt : in String; tmStruct : in tm; us : in Long_Integer) return String is
+      use Formatter_LongInteger;
+      aMonth : constant array (Interfaces.C.int(0)..11) of String(1..3) := ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+      ufmt   : Unbounded_String := To_Unbounded_String(fmt);
+      repl   : Unbounded_String;
+      fmtCh      : Character;
+      posPersent : Natural := Index (ufmt, "%");
+      isUs : Boolean := false;
+   begin
+      while posPersent > 0 and then Length (ufmt) > posPersent  loop
+         fmtCh := Element (ufmt, posPersent + 1);
+         case fmtCh is
+            when 'Y' =>
+               repl := To_Unbounded_String (Integer'Image (Integer (tmStruct.tm_year) + 1900));
+            when 'y' =>
+               repl := To_Unbounded_String (Integer'Image (Integer (tmStruct.tm_year) rem 100));
+            when 'm' =>
+               repl := To_Unbounded_String (aMonth(tmStruct.tm_mon));
+            when 'd' =>
+               repl := To_Unbounded_String (Interfaces.C.int'Image(tmStruct.tm_day));
+            when 'H' =>
+               repl := To_Unbounded_String (Interfaces.C.int'Image(tmStruct.tm_hour));
+            when 'M' =>
+               repl := To_Unbounded_String (Interfaces.C.int'Image(tmStruct.tm_min));
+            when 'S' =>
+               repl := To_Unbounded_String (Interfaces.C.int'Image(tmStruct.tm_sec));
+            when others =>
+               repl := To_Unbounded_String ( To_String (+To_String (ufmt) & us));
+               isUs := true;
+         end case;
+         if isUs then
+            ufmt := repl;
+            isUs := false;
+         else
+            if Element (repl, 1) = ' ' then
+               if Length (repl) = 2 then
+                  Overwrite (repl, 1, "0");
+               else
+                  Trim(repl, Ada.Strings.Left);
+               end if;
+            end if;
+            Replace_Slice (ufmt, posPersent, posPersent + 1, To_String (repl));
+         end if;
+         posPersent := Index(ufmt, "%");
+      end loop;
+      return To_String (ufmt);
+   end FormatDateTime;
 
 end TimeStamp;

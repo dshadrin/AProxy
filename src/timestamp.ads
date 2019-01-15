@@ -46,9 +46,11 @@ package TimeStamp is
                                us            : out Long_Integer;
                                deltaMicrosec : Integer := 0);
    function GetTimestamp return timespec;
-   function GetTimestampStr (tmStruct : in tm; us : in Long_Integer) return String;
+   function GetTimestampStr (tmStruct : in tm; us : in Long_Integer) return String with inline;
    function GetTimestampStr (tv : in timespec) return String;
    function GetTimestampStr return String with inline;
+
+   function FormatDateTime(fmt : in String; tmStruct : in tm; us : in Long_Integer) return String;
 
 private
    TIME_CORRECT_VALUE : Long_Integer;

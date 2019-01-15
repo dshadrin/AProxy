@@ -62,5 +62,8 @@ private
          open_by_demand : Pal.bool;
          handler        : SinkOutputerPtr;
       end record;
+   
+   function MakeFilename (self : in out Sink) return Ada.Strings.Unbounded.Unbounded_String;
+   
 
 end Sinks;

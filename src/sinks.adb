@@ -13,12 +13,14 @@ with Formatted_Output.Enumeration_Output;
 
 package body Sinks is
 
+   package ASU renames Ada.Strings.Unbounded;
+
    -----------------------------------------------------------------------------
-   use all type Ada.Strings.Unbounded.Unbounded_String;
-   type SinkTypeValueArray is array (ESinkType) of Ada.Strings.Unbounded.Unbounded_String;
+   use all type ASU.Unbounded_String;
+   type SinkTypeValueArray is array (ESinkType) of ASU.Unbounded_String;
    sinkTypesStr : constant SinkTypeValueArray := (To_Unbounded_String ("CONSOLE"), To_Unbounded_String ("FILE"));
    
-   type SeverityConfigureString is array (ESeverity) of Ada.Strings.Unbounded.Unbounded_String;
+   type SeverityConfigureString is array (ESeverity) of ASU.Unbounded_String;
    sinkSeverityStr : constant SeverityConfigureString := (To_Unbounded_String ("TRACE"),
                                                           To_Unbounded_String ("DEBUG"),
                                                           To_Unbounded_String ("INFO"),
@@ -105,6 +107,9 @@ package body Sinks is
             self.suffix := suffix;
             self.filename := Null_Unbounded_String;
             self.open_by_demand := demand;
+            if demand = false then
+               self.filename := MakeFilename(self);
+            end if;
          end;
       else
          Put_Line ("Unknown sink :" & To_String (sinkName));
@@ -154,7 +159,7 @@ package body Sinks is
       while isWorked loop
          select
             accept Write (logs : in LogMessages;
-                          file : in Ada.Strings.Unbounded.Unbounded_String := Ada.Strings.Unbounded.Null_Unbounded_String) do
+                          file : in ASU.Unbounded_String := ASU.Null_Unbounded_String) do
                for i in logs.Get.First_Index .. logs.Get.Last_Index loop
                   declare
                      msg : Logging_Message.LogMessage := logs.Get.Element (i);
@@ -180,5 +185,31 @@ package body Sinks is
          end select;
       end loop;
    end SinkOutputer;
+   
+   -----------------------------------------------------------------------------
+   function MakeFilename (self : in out Sink) return Ada.Strings.Unbounded.Unbounded_String is
+      outStr : ASU.Unbounded_String := ASU.Null_Unbounded_String;
+      posDot : Natural := 0;
+   begin
+      if self.SinkType = FILE_SINK then
+         outStr := self.prefix;
+         if ASU.Length (outStr) > 0 then
+            ASU.Append (outStr, "_");
+         end if;
+         ASU.Append (outStr, self.template);
+         if ASU.Length (self.suffix) > 0 then
+            posDot := ASU.Index (outStr, ".", 1);
+            if posDot > 0 then
+               ASU.Insert (outStr, Positive (posDot), ASU.To_String (ASU.To_Unbounded_String ("_") & self.suffix));
+            else
+               ASU.Append (outStr, "_");
+               ASU.Append (outStr, self.suffix);
+            end if;
+         end if;
+      end if;
+      
+      return outStr;
+   end MakeFilename;
+   
    
 end Sinks;
